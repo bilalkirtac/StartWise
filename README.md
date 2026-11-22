@@ -44,6 +44,28 @@ Siemens Openness assemblies are **not** part of this repository; they are loaded
 
 StartWise, Claude'un TIA Portal V21'i kendi bilgisayarınızda, çevrimdışı olarak kullanmasını sağlar: donanım, ağ, sürücüler, saha ekipmanı, tag'ler, bloklar, alarmlar ve HMI ekranları düz cümlelerle kurulur. Kurulum rehberi: [docs/KURULUM.md](docs/KURULUM.md). İletişim ve destek: bilal.kirtac@gmail.com
 
+## For companies
+
+StartWise is free and open source. For teams that want it fitted to their own way of working, these are available on request:
+
+- **Setup and customisation:** your naming rules, tag table structure and standard function blocks built into StartWise's knowledge
+- **Equipment packages:** your machine and equipment types (conveyors, pumps, dosing, ...) prepared in one call, like drives and valves today
+- **Training:** hands-on sessions for your engineering team
+- **Support:** help with issues and updates for new TIA Portal versions
+
+Contact: **bilal.kirtac@gmail.com**
+
+### Şirketler için
+
+StartWise ücretsiz ve açık kaynaktır. Kendi çalışma şeklinize uyarlanmasını isteyen ekipler için şunlar sunulur:
+
+- **Kurulum ve uyarlama:** İsimlendirme kurallarınız, tag tablosu yapınız ve standart FB'leriniz StartWise'ın bilgi tabanına eklenir.
+- **Ekipman paketleri:** Konveyör, pompa, dozaj gibi kendi makine ve ekipman tipleriniz; bugün sürücü ve vanada olduğu gibi tek komutla hazırlanır.
+- **Eğitim:** Mühendis ekibinize uygulamalı kullanım eğitimi.
+- **Destek:** Sorun giderme ve yeni TIA Portal sürümlerine uyum.
+
+İletişim: **bilal.kirtac@gmail.com**
+
 ## Contact
 
 Questions, support or feedback: **bilal.kirtac@gmail.com**, or open an issue on GitHub.
