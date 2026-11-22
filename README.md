@@ -46,7 +46,11 @@ Siemens Openness assemblies are **not** part of this repository; they are loaded
 
 ## Türkçe
 
-StartWise, Claude'un TIA Portal V21'i kendi bilgisayarınızda, çevrimdışı olarak kullanmasını sağlar: donanım, ağ, sürücüler, saha ekipmanı, tag'ler, bloklar, alarmlar ve HMI ekranları düz cümlelerle kurulur. Kurulum rehberi: [docs/KURULUM.md](docs/KURULUM.md).
+StartWise, Claude'un TIA Portal V21'i kendi bilgisayarınızda, çevrimdışı olarak kullanmasını sağlar: donanım, ağ, sürücüler, saha ekipmanı, tag'ler, bloklar, alarmlar ve HMI ekranları düz cümlelerle kurulur. Kurulum rehberi: [docs/KURULUM.md](docs/KURULUM.md). İletişim ve destek: bilal.kirtac@gmail.com
+
+## Contact
+
+Questions, support or feedback: **bilal.kirtac@gmail.com**, or open an issue on GitHub.
 
 ## License
 

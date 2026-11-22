@@ -4,6 +4,7 @@
   "description": "Siemens TIA Portal V21 assistant: hardware, networks, SINAMICS drives, field equipment, PLC blocks, alarms and HMI (classic and WinCC Unified) from plain language, offline through Openness.",
   "author": {
     "name": "Bilal Kirtac (Demory)",
+    "email": "bilal.kirtac@gmail.com",
     "url": "https://github.com/bilalkirtac"
   },
   "homepage": "https://github.com/bilalkirtac/startwise",

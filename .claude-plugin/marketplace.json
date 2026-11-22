@@ -3,6 +3,7 @@
   "description": "StartWise for Siemens TIA Portal - the official StartWise plugin.",
   "owner": {
     "name": "Bilal Kirtac",
+    "email": "bilal.kirtac@gmail.com",
     "url": "https://github.com/bilalkirtac"
   },
   "plugins": [

@@ -33,7 +33,7 @@ Sonra TIA Portal V21'i aç, Claude'a "TIA'ya bağlan" de. İlk bağlantıda TIA 
 
 ## 3. Açık kaynak
 
-StartWise Apache 2.0 lisanslı, ücretsiz ve açık kaynaktır: https://github.com/bilalkirtac/startwise. Hata bildirimi ve öneriler için GitHub'da "Issues" bölümünü kullan.
+StartWise Apache 2.0 lisanslı, ücretsiz ve açık kaynaktır: https://github.com/bilalkirtac/startwise. Hata bildirimi ve öneriler için GitHub'da "Issues" bölümünü kullan ya da yaz: **bilal.kirtac@gmail.com**
 
 ## 4. Sorun giderme
 
