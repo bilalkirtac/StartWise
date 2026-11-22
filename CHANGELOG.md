@@ -3,7 +3,7 @@
 ## 0.34.0 - 2026-11-22
 - Open source (Apache-2.0) and Claude plugin: `.claude-plugin/plugin.json` + `marketplace.json`, skill `startwise-tia`, README, LICENSE, NOTICE.
 - Trial limit and license keys removed (`license_activate` tool, License.cs, STARTWISE_LICENSE). All tools work without a key.
-- Plugin MCP server = the `.mcpb` from the GitHub release; `pack.ps1` keeps plugin.json version and release URL in step with ServerVersion.
+- Two parts: the tools come as the Claude Desktop extension (`.mcpb` on GitHub Releases), the Claude plugin carries the skill. Claude Desktop's marketplace sync rejected a plugin whose MCP server is a remote `.mcpb` URL and one that ships the exe; local plugin MCP servers would only run in Claude Code / Cowork anyway, not in chat.
 
 ## 0.33.0 - 2026-11-21
 - Trial and license. Without a key: changes in up to 3 different TIA projects (a project counts at the first changing tool; it stays usable). Read-only tools and dry runs always work. State kept DPAPI-protected in HKCU\Software\Demory\StartWise and %LOCALAPPDATA%\Demory\StartWise\state.dat (merged).

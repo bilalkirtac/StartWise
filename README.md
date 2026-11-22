@@ -22,14 +22,10 @@ The engineer stays in control: every change is visible in TIA Portal, destructiv
 
 ## Install
 
-**As a Claude plugin:** add this repository as a plugin marketplace and install `startwise`:
+StartWise has two parts. Install both:
 
-```
-/plugin marketplace add bilalkirtac/startwise
-/plugin install startwise@startwise
-```
-
-**As a Claude Desktop extension:** download `StartWise-<version>.mcpb` from the [Releases](https://github.com/bilalkirtac/startwise/releases) page, then Claude Desktop → Settings → Extensions → Advanced settings → **Install Extension…**.
+1. **The tools (Claude Desktop extension).** Download `StartWise-<version>.mcpb` from the [Releases](https://github.com/bilalkirtac/startwise/releases) page, then Claude Desktop → Settings → Extensions → Advanced settings → **Install Extension…**. This is the local server that talks to TIA Portal.
+2. **The skill (Claude plugin).** Settings → Plugins → Add → marketplace `bilalkirtac/StartWise`, then install **startwise**. It teaches Claude the rules and workflows for TIA Portal (defaults, confirmations, which tool for which job).
 
 Then open TIA Portal V21 and tell Claude *"connect to TIA"*. On the first connection TIA Portal asks to allow Openness access: choose **Yes to all**. A Turkish installation guide is in [docs/KURULUM.md](docs/KURULUM.md).
 
@@ -40,7 +36,6 @@ Then open TIA Portal V21 and tell Claude *"connect to TIA"*. On the first connec
 - `src/` – the MCP server (C#)
 - `knowledge/` – defaults, scenarios, equipment blocks (SCL) and the hardware-attribute index Claude reads while working; editable without rebuilding
 - `skills/startwise-tia/` – the skill that teaches Claude how to use the tools
-- `server/` – the built `TiaAssistant.exe` the Claude plugin starts (built from `src/` with `build.cmd`)
 - `packaging/` – extension manifest, icon, installation guide (PDF)
 
 Siemens Openness assemblies are **not** part of this repository; they are loaded from your own TIA Portal installation.

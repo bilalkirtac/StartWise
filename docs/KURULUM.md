@@ -15,21 +15,20 @@ StartWise, Claude'un TIA Portal V21'i senin bilgisayarında, çevrimdışı (off
 
 ## 2. Kurulum
 
-**Claude eklentisi olarak (Claude Code / Cowork):**
+StartWise iki parçadan oluşur, ikisini de kur:
 
-```
-/plugin marketplace add bilalkirtac/startwise
-/plugin install startwise@startwise
-```
-
-**Claude Desktop uzantısı olarak:**
+**1. Araçlar (Claude Desktop uzantısı)** — TIA Portal ile konuşan yerel sunucu:
 
 1. [Releases](https://github.com/bilalkirtac/startwise/releases) sayfasından `StartWise-<sürüm>.mcpb` dosyasını indir.
-2. Claude Desktop → **Settings → Extensions** (yeni görünümde **Settings → Desktop app → Extensions → Manage**) → **Advanced settings** → **Install Extension…** → dosyayı seç.
+2. Claude Desktop → **Settings → Extensions** (yeni görünümde **Settings → Desktop app → Extensions → Manage**) → **Advanced settings** → **Install Extension…** → dosyayı seç → **Install**.
    (Dosyaya çift tıklamak bazı bilgisayarlarda Windows'un "uygulama seç" penceresini açar; o durumda bu yolu kullan.)
-3. **Install** → Claude'u yeniden başlat.
 
-Sonra TIA Portal V21'i aç, Claude'a "TIA'ya bağlan" de. İlk bağlantıda TIA bir Openness erişim onayı sorar → **Yes to all**.
+**2. Beceri (Claude eklentisi)** — Claude'a TIA kurallarını ve iş akışlarını öğretir:
+
+1. Claude → **Settings → Plugins → Add** → marketplace: `bilalkirtac/StartWise` → **Sync**.
+2. Listede **startwise** eklentisini kur.
+
+Sonra Claude'u yeniden başlat, TIA Portal V21'i aç ve Claude'a "TIA'ya bağlan" de. İlk bağlantıda TIA bir Openness erişim onayı sorar → **Yes to all**.
 
 ## 3. Açık kaynak
 
