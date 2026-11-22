@@ -19,6 +19,5 @@
     "sinamics",
     "wincc",
     "automation"
-  ],
-  "mcpServers": "https://github.com/bilalkirtac/startwise/releases/download/v0.34.0/StartWise-0.34.0.mcpb"
+  ]
 }
