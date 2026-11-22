@@ -19,5 +19,11 @@
     "sinamics",
     "wincc",
     "automation"
-  ]
+  ],
+  "icon": "./.claude-plugin/icon.png",
+  "mcpServers": {
+    "startwise": {
+      "command": "${CLAUDE_PLUGIN_ROOT}/server/TiaAssistant.exe"
+    }
+  }
 }
