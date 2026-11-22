@@ -16,6 +16,16 @@ StartWise drives the TIA Portal V21 that is open on the user's computer through 
 - Defaults unless the user says otherwise: hardware from real article numbers (`catalog_find`, never invent an MLFB), newest firmware, PLCs without password protection, all devices on one subnet (`PN/IE_1`), drives as IO devices of the PLC's IO system, telegram 20 for asynchronous drives.
 - Screen layout and visual design belong to the engineer. Create and bind HMI tags, screens and objects; place them with the automatic layout and do not ask for positions.
 
+## If the StartWise tools are missing
+
+This plugin carries the skill only. The tools (`tia_status`, `device_add`, `drive_prepare` ...) come from the StartWise desktop extension, a local server that must be installed once on the Windows PC where TIA Portal V21 runs. If none of these tools is available, do not try to do the work another way. Tell the user, in their language:
+
+1. Download `StartWise-<version>.mcpb` from https://github.com/bilalkirtac/StartWise/releases (latest release).
+2. Claude Desktop → Settings → Extensions (or Settings → Desktop app → Extensions → Manage) → Advanced settings → **Install Extension…** → choose the file → Install.
+3. Restart Claude, open TIA Portal V21, and ask again.
+
+Requirements to mention: Windows, TIA Portal V21 with the licenses for what they build, and their Windows user in the "Siemens TIA Openness" group. Installation guide (Turkish): https://github.com/bilalkirtac/StartWise/blob/main/docs/KURULUM.md. Support: bilal.kirtac@gmail.com.
+
 ## Start of every session
 
 1. `tia_status` - Openness found? user in the "Siemens TIA Openness" group? TIA running? If not, say exactly what is missing.
