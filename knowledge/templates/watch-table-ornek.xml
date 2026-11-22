@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Document>
+  <Engineering version="V18" />
+  <DocumentInfo>
+    <Created>2026-11-18T07:26:10.6281665Z</Created>
+    <ExportSetting>WithDefaults</ExportSetting>
+    <InstalledProducts>
+      <Product>
+        <DisplayName>Totally Integrated Automation Portal</DisplayName>
+        <DisplayVersion>V18 Update 6</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>TIA Portal Openness</DisplayName>
+        <DisplayVersion>V18 Update 6 </DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>TIA Portal Version Control Interface</DisplayName>
+        <DisplayVersion>V18</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>SINAMICS Startdrive Advanced</DisplayName>
+        <DisplayVersion>V18 SP2 Update 1</DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>SINAMICS DCC</DisplayName>
+        <DisplayVersion>V18 Update 1</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G110M, G120, G120C, G120D, G120P, G115D</DisplayName>
+        <DisplayVersion>V18 SP2 Update 1</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>SINAMICS Startdrive G130, G150, S120, S150, SINAMICS MV, S210, G220, S200</DisplayName>
+        <DisplayVersion>V18 SP2 Update 1</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>STEP 7 Professional</DisplayName>
+        <DisplayVersion>V18 Update 6 </DisplayVersion>
+      </Product>
+      <OptionPackage>
+        <DisplayName>STEP 7 CFC</DisplayName>
+        <DisplayVersion>V18 Update 2</DisplayVersion>
+      </OptionPackage>
+      <OptionPackage>
+        <DisplayName>STEP 7 Safety</DisplayName>
+        <DisplayVersion>V18</DisplayVersion>
+      </OptionPackage>
+      <Product>
+        <DisplayName>WinCC Professional</DisplayName>
+        <DisplayVersion>V18 Update 6 </DisplayVersion>
+      </Product>
+    </InstalledProducts>
+  </DocumentInfo>
+    <SW.WatchAndForceTables.PlcWatchTable ID="0">
+    <AttributeList>
+      <Name>Drive_1_Izleme</Name>
+    </AttributeList>
+    <ObjectList>
+      <SW.WatchAndForceTables.PlcWatchTableEntry ID="1" CompositionName="Entries">
+        <AttributeList>
+          <DisplayFormat>Bool</DisplayFormat>
+          <ModifyTrigger>Permanent</ModifyTrigger>
+          <ModifyValue />
+          <MonitorTrigger>Permanent</MonitorTrigger>
+          <Name>"Motor1_Start"</Name>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="2" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="3" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text>Senaryo: start komutu</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.WatchAndForceTables.PlcWatchTableEntry>
+      <SW.WatchAndForceTables.PlcWatchTableEntry ID="4" CompositionName="Entries">
+        <AttributeList>
+          <DisplayFormat>DEC_signed</DisplayFormat>
+          <ModifyTrigger>Permanent</ModifyTrigger>
+          <ModifyValue />
+          <MonitorTrigger>Permanent</MonitorTrigger>
+          <Name>"Motor1_Hiz"</Name>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="5" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="6" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text>Senaryo: hız referansı (rpm)</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.WatchAndForceTables.PlcWatchTableEntry>
+      <SW.WatchAndForceTables.PlcWatchTableEntry ID="7" CompositionName="Entries">
+        <AttributeList>
+          <DisplayFormat>Bool</DisplayFormat>
+          <ModifyTrigger>Permanent</ModifyTrigger>
+          <ModifyValue />
+          <MonitorTrigger>Permanent</MonitorTrigger>
+          <Name>"Motor1_Calisiyor"</Name>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="8" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="9" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text>Senaryo: çalışıyor geri bildirimi</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.WatchAndForceTables.PlcWatchTableEntry>
+      <SW.WatchAndForceTables.PlcWatchTableEntry ID="A" CompositionName="Entries">
+        <AttributeList>
+          <DisplayFormat>Bool</DisplayFormat>
+          <ModifyTrigger>Permanent</ModifyTrigger>
+          <ModifyValue />
+          <MonitorTrigger>Permanent</MonitorTrigger>
+          <Name>"DB_Drive_1_Durum".Calisiyor</Name>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="B" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="C" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text>Drive_1 çalışıyor (SINA_SPEED AxisEnabled)</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.WatchAndForceTables.PlcWatchTableEntry>
+      <SW.WatchAndForceTables.PlcWatchTableEntry ID="D" CompositionName="Entries">
+        <AttributeList>
+          <DisplayFormat>Bool</DisplayFormat>
+          <ModifyTrigger>Permanent</ModifyTrigger>
+          <ModifyValue />
+          <MonitorTrigger>Permanent</MonitorTrigger>
+          <Name>"DB_Drive_1_Durum".Hata</Name>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="E" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="F" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text>Drive_1 hata</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.WatchAndForceTables.PlcWatchTableEntry>
+      <SW.WatchAndForceTables.PlcWatchTableEntry ID="10" CompositionName="Entries">
+        <AttributeList>
+          <DisplayFormat>Bool</DisplayFormat>
+          <ModifyTrigger>Permanent</ModifyTrigger>
+          <ModifyValue />
+          <MonitorTrigger>Permanent</MonitorTrigger>
+          <Name>"DB_Drive_1_Durum".Kilit</Name>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="11" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="12" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text>Drive_1 devreye alma kilidi</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.WatchAndForceTables.PlcWatchTableEntry>
+      <SW.WatchAndForceTables.PlcWatchTableEntry ID="13" CompositionName="Entries">
+        <AttributeList>
+          <DisplayFormat>Hex</DisplayFormat>
+          <ModifyTrigger>Permanent</ModifyTrigger>
+          <ModifyValue />
+          <MonitorTrigger>Permanent</MonitorTrigger>
+          <Name>"DB_Drive_1_Durum".Status</Name>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="14" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="15" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text>SINA_SPEED Status kelimesi</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.WatchAndForceTables.PlcWatchTableEntry>
+      <SW.WatchAndForceTables.PlcWatchTableEntry ID="16" CompositionName="Entries">
+        <AttributeList>
+          <DisplayFormat>Float</DisplayFormat>
+          <ModifyTrigger>Permanent</ModifyTrigger>
+          <ModifyValue />
+          <MonitorTrigger>Permanent</MonitorTrigger>
+          <Name>"DB_Drive_1_Durum".Hiz_rpm</Name>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="17" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="18" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text>Gerçek hız (rpm)</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.WatchAndForceTables.PlcWatchTableEntry>
+      <SW.WatchAndForceTables.PlcWatchTableEntry ID="19" CompositionName="Entries">
+        <AttributeList>
+          <DisplayFormat>Float</DisplayFormat>
+          <ModifyTrigger>Permanent</ModifyTrigger>
+          <ModifyValue />
+          <MonitorTrigger>Permanent</MonitorTrigger>
+          <Name>"DB_Drive_1_Durum".Akim_A</Name>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="1A" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="1B" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text>Motor akımı (A) = ham / 16384 * Ref_Akim_A</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.WatchAndForceTables.PlcWatchTableEntry>
+      <SW.WatchAndForceTables.PlcWatchTableEntry ID="1C" CompositionName="Entries">
+        <AttributeList>
+          <DisplayFormat>DEC_signed</DisplayFormat>
+          <ModifyTrigger>Permanent</ModifyTrigger>
+          <ModifyValue />
+          <MonitorTrigger>Permanent</MonitorTrigger>
+          <Name>"Drive_1_Akim_Ham"</Name>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="1D" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="1E" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text>Telegram 20 ham akım (IAIST_GLATT, 16384 = %100)</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.WatchAndForceTables.PlcWatchTableEntry>
+      <SW.WatchAndForceTables.PlcWatchTableEntry ID="1F" CompositionName="Entries">
+        <AttributeList>
+          <DisplayFormat>Float</DisplayFormat>
+          <ModifyTrigger>Permanent</ModifyTrigger>
+          <ModifyValue />
+          <MonitorTrigger>Permanent</MonitorTrigger>
+          <Name>"DB_Drive_1_Durum".Tork_Nm</Name>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="20" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="21" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text>Tork (Nm)</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.WatchAndForceTables.PlcWatchTableEntry>
+      <SW.WatchAndForceTables.PlcWatchTableEntry ID="22" CompositionName="Entries">
+        <AttributeList>
+          <DisplayFormat>Float</DisplayFormat>
+          <ModifyTrigger>Permanent</ModifyTrigger>
+          <ModifyValue />
+          <MonitorTrigger>Permanent</MonitorTrigger>
+          <Name>"DB_Drive_1_Durum".Guc_kW</Name>
+        </AttributeList>
+        <ObjectList>
+          <MultilingualText ID="23" CompositionName="Comment">
+            <ObjectList>
+              <MultilingualTextItem ID="24" CompositionName="Items">
+                <AttributeList>
+                  <Culture>en-US</Culture>
+                  <Text>Güç (kW)</Text>
+                </AttributeList>
+              </MultilingualTextItem>
+            </ObjectList>
+          </MultilingualText>
+        </ObjectList>
+      </SW.WatchAndForceTables.PlcWatchTableEntry>
+    </ObjectList>
+  </SW.WatchAndForceTables.PlcWatchTable>
+</Document>

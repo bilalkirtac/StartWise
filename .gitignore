@@ -1,0 +1,7 @@
+bin/
+dist/
+work/
+*.log
+*.old.exe
+*.pem
+_lisans/

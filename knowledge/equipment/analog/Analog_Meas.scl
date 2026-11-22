@@ -1,0 +1,90 @@
+FUNCTION_BLOCK "Analog_Meas"
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : StartWise
+FAMILY : Equipment
+VERSION : 0.1
+// Analog olcum: ham degeri (0..27648) muhendislik birimine olcekler, HH/H/L/LL alarmlari histerezisle uretir,
+// kablo kopmasi / tasma (ham deger olcum araliginin disinda) hatasi verir.
+// Alarm kurma:  H/HH  Value >= esik        -> kurulur;  Value < esik - Hyst -> silinir
+//               L/LL  Value <= esik        -> kurulur;  Value > esik + Hyst -> silinir
+// Senaryo kodu instance DB'yi okur: "TT3300".Value, "TT3300".AlarmH ...; esikler HMI/senaryodan yazilabilir.
+   VAR_INPUT
+      Raw : Int;   // Ham deger (analog giris, %IW) - saha girisi
+      RawLow : Int := 0;   // Ham alt sinir (S7: 0)
+      RawHigh : Int := 27648;   // Ham ust sinir (S7: 27648)
+      ScaleLow : Real := 0.0;   // Muhendislik birimi alt sinir (ör. 0 bar)
+      ScaleHigh : Real := 100.0;   // Muhendislik birimi ust sinir (ör. 10 bar)
+      LimitHH : Real := 95.0;   // Cok yuksek alarm esigi
+      LimitH : Real := 85.0;   // Yuksek alarm esigi
+      LimitL : Real := 15.0;   // Dusuk alarm esigi
+      LimitLL : Real := 5.0;   // Cok dusuk alarm esigi
+      Hyst : Real := 1.0;   // Histerezis (tolerans), muhendislik biriminde, tum esikler icin
+      EnHH : Bool := TRUE;   // HH alarmi etkin
+      EnH : Bool := TRUE;   // H alarmi etkin
+      EnL : Bool := TRUE;   // L alarmi etkin
+      EnLL : Bool := TRUE;   // LL alarmi etkin
+      Simulation : Bool;   // TRUE = Value yerine SimValue kullanilir (devreye alma)
+      SimValue : Real;   // Simulasyon degeri (muhendislik birimi)
+   END_VAR
+
+   VAR_OUTPUT
+      Value : Real;   // Olceklenmis deger (muhendislik birimi)
+      AlarmHH : Bool;   // Cok yuksek
+      AlarmH : Bool;   // Yuksek
+      AlarmL : Bool;   // Dusuk
+      AlarmLL : Bool;   // Cok dusuk
+      Error : Bool;   // Kablo kopmasi / tasma / gecersiz parametre (Value son gecerli degerde kalir)
+      Status : Word;   // HMI: bit0 HH, 1 H, 2 L, 3 LL, 4 Error, 5 Simulasyon
+   END_VAR
+
+   VAR
+      lastV : Real;   // Son gecerli deger
+      hh : Bool;
+      h : Bool;
+      l : Bool;
+      ll : Bool;
+   END_VAR
+
+   VAR_TEMP
+      v : Real;
+      bad : Bool;
+   END_VAR
+
+
+BEGIN
+	// 1) Olcekleme. S7 analog kartlarda 32767 / -32768 ve 27648*1.176 (=32511) ustu tasma ve kablo kopmasidir.
+	#bad := (#Raw > 32511) OR (#Raw < -4864) OR (#RawHigh = #RawLow);
+	IF #Simulation THEN
+	    #v := #SimValue;
+	    #bad := FALSE;
+	ELSIF NOT #bad THEN
+	    #v := (INT_TO_REAL(#Raw) - INT_TO_REAL(#RawLow)) / (INT_TO_REAL(#RawHigh) - INT_TO_REAL(#RawLow))
+	          * (#ScaleHigh - #ScaleLow) + #ScaleLow;
+	ELSE
+	    #v := #lastV;   // hatada son gecerli deger korunur
+	END_IF;
+	#lastV := #v;
+	#Value := #v;
+	#Error := #bad;
+
+	// 2) Alarmlar (histerezisli). Hatada alarmlar degismez.
+	IF NOT #bad THEN
+	    IF #v >= #LimitHH THEN #hh := TRUE; ELSIF #v < #LimitHH - #Hyst THEN #hh := FALSE; END_IF;
+	    IF #v >= #LimitH THEN #h := TRUE; ELSIF #v < #LimitH - #Hyst THEN #h := FALSE; END_IF;
+	    IF #v <= #LimitL THEN #l := TRUE; ELSIF #v > #LimitL + #Hyst THEN #l := FALSE; END_IF;
+	    IF #v <= #LimitLL THEN #ll := TRUE; ELSIF #v > #LimitLL + #Hyst THEN #ll := FALSE; END_IF;
+	END_IF;
+	#AlarmHH := #hh AND #EnHH;
+	#AlarmH := #h AND #EnH;
+	#AlarmL := #l AND #EnL;
+	#AlarmLL := #ll AND #EnLL;
+
+	// 3) HMI durum kelimesi
+	#Status := 16#0000;
+	#Status.%X0 := #AlarmHH;
+	#Status.%X1 := #AlarmH;
+	#Status.%X2 := #AlarmL;
+	#Status.%X3 := #AlarmLL;
+	#Status.%X4 := #Error;
+	#Status.%X5 := #Simulation;
+END_FUNCTION_BLOCK

@@ -1,0 +1,15 @@
+{
+  "name": "startwise",
+  "description": "StartWise for Siemens TIA Portal - the official StartWise plugin.",
+  "owner": {
+    "name": "Bilal Kirtac",
+    "url": "https://github.com/bilalkirtac"
+  },
+  "plugins": [
+    {
+      "name": "startwise",
+      "source": "./",
+      "description": "Siemens TIA Portal V21 assistant: hardware, drives, field equipment, PLC blocks, alarms and HMI from plain language, offline through Openness."
+    }
+  ]
+}

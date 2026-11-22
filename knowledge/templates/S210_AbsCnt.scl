@@ -1,0 +1,83 @@
+FUNCTION_BLOCK "S210_AbsCnt"
+TITLE = S210 absolute positioning control (generic, one instance per axis)
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : StartWise
+VERSION : 0.2
+//Genel S210 / TO_PositioningAxis kontrol blogu. Her eksen icin bir instance;
+//eksenin TO DB'si 'Axis' girisine baglanir. MC bloklari {MC_VERSION} (TO surumu ile ayni).
+//S7-1500 TO durumu StatusWord (DWord) bitlerindedir: bit 5 = HomingDone (Siemens FAQ).
+   VAR_INPUT 
+      Enable : Bool;   // Ekseni enerjilendir (MC_POWER)
+      Reset : Bool;   // Hata resetle (yukselen kenar)
+      Home : Bool;   // Referanslama baslat (yukselen kenar)
+      HomeMode : Int := 7;   // MC_HOME modu (7 = mutlak enkoder ayari, mutlak)
+      HomePosition : LReal;   // Referans konumu
+      StartPos : Bool;   // Mutlak konumlama baslat (yukselen kenar)
+      Position : LReal;   // Hedef konum
+      Velocity : LReal := 10.0;   // Konumlama hizi
+      Direction : Int := 1;   // MC_MOVEABSOLUTE yonu (1 = pozitif, sadece modulo eksen)
+      JogFwd : Bool;   // Ileri jog (basili tutuldukca)
+      JogBwd : Bool;   // Geri jog (basili tutuldukca)
+      JogVelocity : LReal := 5.0;   // Jog hizi
+      Stop : Bool;   // Hareketi durdur (yukselen kenar, MC_HALT)
+      StandStillVel : LReal := 0.01;   // Bu hizin altinda ve komut yoksa 'duruyor'
+   END_VAR
+
+   VAR_OUTPUT 
+      Powered : Bool;   // Eksen enerjili
+      Homed : Bool;   // Eksen referansli
+      Busy : Bool;   // Bir hareket komutu calisiyor
+      InPosition : Bool;   // Son mutlak konumlama tamamlandi
+      StandStill : Bool;   // Eksen duruyor
+      ActPos : LReal;   // Gercek konum
+      ActVel : LReal;   // Gercek hiz
+      Error : Bool;   // Blok veya eksen hatasi
+      ErrorID : Word;   // Ilk hata kodu (MC bloklarindan)
+   END_VAR
+
+   VAR_IN_OUT 
+      Axis : TO_PositioningAxis;   // Eksenin TO DB'si
+   END_VAR
+
+   VAR 
+      instPower {InstructionName := 'MC_POWER'; LibVersion := '{MC_VERSION}'} : MC_POWER;
+      instReset {InstructionName := 'MC_RESET'; LibVersion := '{MC_VERSION}'} : MC_RESET;
+      instHome {InstructionName := 'MC_HOME'; LibVersion := '{MC_VERSION}'} : MC_HOME;
+      instMoveAbs {InstructionName := 'MC_MOVEABSOLUTE'; LibVersion := '{MC_VERSION}'} : MC_MOVEABSOLUTE;
+      instJog {InstructionName := 'MC_MOVEJOG'; LibVersion := '{MC_VERSION}'} : MC_MOVEJOG;
+      instHalt {InstructionName := 'MC_HALT'; LibVersion := '{MC_VERSION}'} : MC_HALT;
+   END_VAR
+
+BEGIN
+	#instPower(Axis := #Axis, Enable := #Enable, StartMode := 1, StopMode := 0);
+	#instReset(Axis := #Axis, Execute := #Reset, Restart := FALSE);
+	#instHome(Axis := #Axis, Execute := #Home, Position := #HomePosition, Mode := #HomeMode);
+	#instMoveAbs(Axis := #Axis, Execute := #StartPos, Position := #Position, Velocity := #Velocity, Direction := #Direction);
+	#instJog(Axis := #Axis, JogForward := #JogFwd AND NOT #JogBwd, JogBackward := #JogBwd AND NOT #JogFwd,
+	         Velocity := #JogVelocity, PositionControlled := TRUE);
+	#instHalt(Axis := #Axis, Execute := #Stop);
+	
+	#Powered := #instPower.Status;
+	#Homed := #Axis.StatusWord.%X5;          // HomingDone
+	#ActPos := #Axis.ActualPosition;
+	#ActVel := #Axis.ActualVelocity;
+	#Busy := #instHome.Busy OR #instMoveAbs.Busy OR #instJog.Busy OR #instHalt.Busy;
+	#StandStill := NOT #Busy AND ABS(#ActVel) < #StandStillVel;
+	
+	IF #instMoveAbs.Done THEN
+	    #InPosition := TRUE;
+	ELSIF #instMoveAbs.Busy OR #instJog.Busy OR #instHome.Busy THEN
+	    #InPosition := FALSE;
+	END_IF;
+	
+	#Error := #instPower.Error OR #instReset.Error OR #instHome.Error OR #instMoveAbs.Error
+	          OR #instJog.Error OR #instHalt.Error OR (#Axis.ErrorWord <> 0);
+	IF #instPower.Error THEN #ErrorID := #instPower.ErrorID;
+	ELSIF #instHome.Error THEN #ErrorID := #instHome.ErrorID;
+	ELSIF #instMoveAbs.Error THEN #ErrorID := #instMoveAbs.ErrorID;
+	ELSIF #instJog.Error THEN #ErrorID := #instJog.ErrorID;
+	ELSIF #instHalt.Error THEN #ErrorID := #instHalt.ErrorID;
+	ELSIF #instReset.Error THEN #ErrorID := #instReset.ErrorID;
+	ELSE #ErrorID := 16#0000;
+	END_IF;
+END_FUNCTION_BLOCK

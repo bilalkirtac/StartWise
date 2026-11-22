@@ -1,0 +1,123 @@
+FUNCTION_BLOCK "Valve_SA"
+{ S7_Optimized_Access := 'TRUE' }
+AUTHOR : StartWise
+FAMILY : Equipment
+VERSION : 0.3
+// Tek etkili (yay geri donuslu) vana: tek bobin, acik/kapali geri bildirim.
+// Out = 1 -> vana acilir. Bobin enerjisi kesilince vana kapanir (emniyetli konum).
+// Hata (ErrOpen/ErrClose) olunca cikis kapanir; Reset'e kadar acilmaz.
+// Mantik Siemens APL VlvL'ye benzer: otomatik/manuel mod, kilitleme, hareket suresi izleme, hata reseti.
+// Senaryo kodu instance DB'ye yazar/okur: "V3300".Auto, "V3300".AutoOpen, "V3300".Opened ...
+   VAR_INPUT
+      Auto : Bool := TRUE;   // TRUE = otomatik (AutoOpen gecerli), FALSE = manuel (ManOpen/ManClose gecerli)
+      AutoOpen : Bool;   // Otomatik acma komutu (senaryo kodu)
+      ManOpen : Bool;   // Manuel ac (HMI, darbe)
+      ManClose : Bool;   // Manuel kapat (HMI, darbe)
+      Interlock : Bool := TRUE;   // TRUE = izin var. FALSE iken vana her modda kapatilir
+      Reset : Bool;   // Hata reseti (darbe)
+      FbOpen : Bool;   // Acik geri bildirimi (ZSO) - saha girisi
+      FbClosed : Bool;   // Kapali geri bildirimi (ZSC) - saha girisi
+      NoFbOpen : Bool;   // TRUE = acik geri bildirimi yok (komuttan turetilir)
+      NoFbClosed : Bool;   // TRUE = kapali geri bildirimi yok (komuttan turetilir)
+      MonTime : Time := T#5S;   // Hareket izleme suresi: bu surede konuma gelmezse hata
+      Simulation : Bool;   // TRUE = geri bildirimler komuttan simule edilir (devreye alma)
+   END_VAR
+
+   VAR_OUTPUT
+      Out : Bool;   // Bobin cikisi (Y) - saha cikisi
+      Opened : Bool;   // Vana acik
+      Closed : Bool;   // Vana kapali
+      Moving : Bool;   // Hareket halinde (izleme suresi dolmadi)
+      ErrOpen : Bool;   // Acilmadi / acikken konumunu kaybetti (kalici, Reset ile silinir; cikisi kapatir)
+      ErrClose : Bool;   // Kapanmadi / kapaliyken konumunu kaybetti (kalici, Reset ile silinir; cikisi kapatir)
+      Error : Bool;   // ErrOpen OR ErrClose
+      Status : Word;   // HMI: bit0 Auto, 1 Out, 2 Opened, 3 Closed, 4 Moving, 5 ErrOpen, 6 ErrClose, 7 Kilitli, 8 Simulasyon
+   END_VAR
+
+   VAR
+      manCmd : Bool;   // Manuel modda tutulan komut
+      errOpenL : Bool;   // Kalici acilma hatasi
+      errCloseL : Bool;   // Kalici kapanma hatasi
+      outPrev : Bool;
+      tonMon : TON_TIME;
+   END_VAR
+
+   VAR_TEMP
+      cmd : Bool;
+      fbO : Bool;
+      fbC : Bool;
+      inPos : Bool;
+   END_VAR
+
+
+BEGIN
+	// 0) Hata reseti (komuttan once: reset cevriminde vana yeniden acilabilir)
+	IF #Reset THEN
+	    #errOpenL := FALSE;
+	    #errCloseL := FALSE;
+	END_IF;
+	
+	// 1) Komut: otomatikte AutoOpen, manuelde HMI darbeleriyle tutulan komut.
+	//    Otomatikteyken manuel komut otomatigi izler (moda geciste vana yerinde kalir).
+	IF #Auto THEN
+	    #cmd := #AutoOpen;
+	    #manCmd := #AutoOpen;
+	ELSE
+	    IF #ManOpen THEN
+	        #manCmd := TRUE;
+	    END_IF;
+	    IF #ManClose THEN
+	        #manCmd := FALSE;
+	    END_IF;
+	    #cmd := #manCmd;
+	END_IF;
+
+	// 2) Kilitleme ve hata her modda kapatir (manuel komut da silinir).
+	IF NOT #Interlock OR #errOpenL OR #errCloseL THEN
+	    #cmd := FALSE;
+	    #manCmd := FALSE;
+	END_IF;
+	#Out := #cmd;
+
+	// 3) Geri bildirimler (yoksa veya simulasyonda komuttan turetilir)
+	IF #Simulation THEN
+	    #fbO := #Out;
+	    #fbC := NOT #Out;
+	ELSE
+	    #fbO := (#NoFbOpen AND #Out) OR (NOT #NoFbOpen AND #FbOpen);
+	    #fbC := (#NoFbClosed AND NOT #Out) OR (NOT #NoFbClosed AND #FbClosed);
+	END_IF;
+	#Opened := #fbO AND NOT #fbC;
+	#Closed := #fbC AND NOT #fbO;
+	#inPos := (#Out AND #Opened) OR (NOT #Out AND #Closed);
+
+	// 4) Izleme: komut degisince veya Reset'te zamanlayici yeniden baslar.
+	IF #Reset OR (#Out <> #outPrev) THEN
+	    #tonMon(IN := FALSE, PT := #MonTime);
+	END_IF;
+	#outPrev := #Out;
+	#tonMon(IN := NOT #inPos, PT := #MonTime);
+	IF #tonMon.Q THEN
+	    IF #Out THEN
+	        #errOpenL := TRUE;
+	    ELSE
+	        #errCloseL := TRUE;
+	    END_IF;
+	END_IF;
+	#Moving := NOT #inPos AND NOT #tonMon.Q;
+	#ErrOpen := #errOpenL;
+	#ErrClose := #errCloseL;
+	#Error := #errOpenL OR #errCloseL;
+
+	// 5) HMI durum kelimesi
+	#Status := 16#0000;
+	#Status.%X0 := #Auto;
+	#Status.%X1 := #Out;
+	#Status.%X2 := #Opened;
+	#Status.%X3 := #Closed;
+	#Status.%X4 := #Moving;
+	#Status.%X5 := #ErrOpen;
+	#Status.%X6 := #ErrClose;
+	#Status.%X7 := NOT #Interlock;
+	#Status.%X8 := #Simulation;
+END_FUNCTION_BLOCK

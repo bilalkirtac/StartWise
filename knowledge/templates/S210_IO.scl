@@ -1,0 +1,34 @@
+TYPE "S210_IO"
+TITLE = Servo surucu arayuzu (senaryo <-> S210_AbsCnt)
+VERSION : 0.1
+//StartWise: her servo surucu icin bir "<surucu>_IO" DB bu tipten turetilir.
+   STRUCT
+      Cmd : Struct   // Senaryodan gelen komutlar
+         Enable : Bool;   // Ekseni enerjilendir
+         Reset : Bool;   // Hata resetle (kenar)
+         Home : Bool;   // Referanslama baslat (kenar)
+         HomeMode : Int := 7;   // MC_HOME modu (7 = mutlak enkoder ayari)
+         HomePosition : LReal;   // Referans konumu
+         StartPos : Bool;   // Mutlak konumlama baslat (kenar)
+         Position : LReal;   // Hedef konum
+         Velocity : LReal := 10.0;   // Konumlama hizi
+         Direction : Int := 1;   // Yon (modulo eksen)
+         JogFwd : Bool;   // Ileri jog
+         JogBwd : Bool;   // Geri jog
+         JogVelocity : LReal := 5.0;   // Jog hizi
+         Stop : Bool;   // Durdur (kenar)
+         StandStillVel : LReal := 0.01;   // Durus hiz esigi
+      END_STRUCT;
+      Sts : Struct   // Senaryonun okudugu durum
+         Powered : Bool;   // Enerjili
+         Homed : Bool;   // Referansli
+         Busy : Bool;   // Hareket komutu calisiyor
+         InPosition : Bool;   // Hedefte
+         StandStill : Bool;   // Duruyor
+         ActPos : LReal;   // Gercek konum
+         ActVel : LReal;   // Gercek hiz
+         Error : Bool;   // Hata
+         ErrorID : Word;   // Hata kodu
+      END_STRUCT;
+   END_STRUCT;
+END_TYPE

@@ -1,0 +1,63 @@
+# Packs StartWise as a Claude Desktop extension (.mcpb = zip with manifest.json at the root).
+# Run after build.cmd (V21):   powershell -ExecutionPolicy Bypass -File packaging\pack.ps1
+# Output: dist\StartWise-<version>.mcpb  -> double-click it (or drag it into Claude Desktop) to install.
+# No source code goes into the package: manifest, icon, the V21 exe and knowledge\ (without generators).
+$ErrorActionPreference = 'Stop'
+$root = Split-Path -Parent $PSScriptRoot
+$exe  = Join-Path $root 'bin\V21\TiaAssistant.exe'
+if (-not (Test-Path $exe)) { throw "Build first: $exe not found (run build.cmd)." }
+
+# Version from the source (ServerVersion) so the package and the exe always agree.
+$prog = Get-Content (Join-Path $root 'src\Program.cs') -Raw
+$ver = [regex]::Match($prog, 'ServerVersion\s*=\s*"([^"]+)"').Groups[1].Value
+if (-not $ver) { throw 'ServerVersion not found in src\Program.cs' }
+
+# Plain text replace (no JSON round trip: Windows PowerShell's ConvertTo-Json rewrites arrays and escapes).
+$manifest = Get-Content (Join-Path $PSScriptRoot 'mcpb\manifest.json') -Raw -Encoding UTF8
+$manifest = [regex]::Replace($manifest, '"version"\s*:\s*"[^"]*"', ('"version": "' + $ver + '"'), 1)
+
+# Claude plugin: version and release URL of the bundled MCP server follow ServerVersion.
+$pj = Join-Path $root '.claude-plugin\plugin.json'
+if (Test-Path $pj) {
+    $p = Get-Content $pj -Raw -Encoding UTF8
+    $p = [regex]::Replace($p, '"version"\s*:\s*"[^"]*"', ('"version": "' + $ver + '"'), 1)
+    $p = [regex]::Replace($p, 'releases/download/v[^/]+/StartWise-[^"]+\.mcpb', ('releases/download/v' + $ver + '/StartWise-' + $ver + '.mcpb'))
+    [System.IO.File]::WriteAllText($pj, $p, (New-Object System.Text.UTF8Encoding($false)))
+}
+
+$dist = Join-Path $root 'dist'
+New-Item -ItemType Directory -Force -Path $dist | Out-Null
+$out = Join-Path $dist "StartWise-$ver.mcpb"
+if (Test-Path $out) { Remove-Item $out }
+
+Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
+$zip = [System.IO.Compression.ZipFile]::Open($out, 'Create')
+try {
+    function Add-Entry([string]$file, [string]$name) {
+        # forward slashes: Windows PowerShell's Compress-Archive writes '\' which other tools read as part of the name
+        [void][System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $file, $name.Replace('\', '/'), 'Optimal')
+    }
+    $e = $zip.CreateEntry('manifest.json')
+    $w = New-Object System.IO.StreamWriter($e.Open(), (New-Object System.Text.UTF8Encoding($false)))
+    $w.Write($manifest); $w.Close()
+
+    Add-Entry (Join-Path $PSScriptRoot 'mcpb\icon.png') 'icon.png'
+    $pdf = Join-Path $PSScriptRoot 'StartWise-Kurulum.pdf'
+    if (Test-Path $pdf) { Add-Entry $pdf 'StartWise-Kurulum.pdf' }
+    Add-Entry $exe 'server/TiaAssistant.exe'
+
+    $k = Join-Path $root 'knowledge'
+    Get-ChildItem $k -Recurse -File | Where-Object { $_.FullName -notmatch '\\generators\\' } | ForEach-Object {
+        Add-Entry $_.FullName ('knowledge/' + $_.FullName.Substring($k.Length + 1))
+    }
+}
+finally { $zip.Dispose() }
+
+# the install guide also goes next to the package: users read it before installing
+if (Test-Path (Join-Path $PSScriptRoot 'StartWise-Kurulum.pdf')) { Copy-Item (Join-Path $PSScriptRoot 'StartWise-Kurulum.pdf') $dist -Force }
+
+$size = [math]::Round((Get-Item $out).Length / 1KB)
+Write-Host "PACKED: $out ($size KB, version $ver)"
+Write-Host 'Install: Claude Desktop > Settings > Extensions > Advanced settings > Install Extension... (see StartWise-Kurulum.pdf).'
+Write-Host ('Release: create GitHub release v' + $ver + ' and attach ' + (Split-Path $out -Leaf) + ' (the plugin downloads it from there).')
+Write-Host 'Before testing the package on this PC, remove the hand-made "startwise-v21" entry from claude_desktop_config.json, or the tools appear twice.'

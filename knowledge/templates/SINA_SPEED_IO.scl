@@ -1,0 +1,22 @@
+TYPE "SINA_SPEED_IO"
+TITLE = Asenkron surucu arayuzu (senaryo <-> SINA_SPEED)
+VERSION : 0.1
+//StartWise: her asenkron surucu icin bir "<surucu>_IO" DB bu tipten turetilir.
+   STRUCT
+      Cmd : Struct   // Senaryodan gelen komutlar
+         EnableAxis : Bool;   // Surucuyu calistir
+         AckError : Bool;   // Hata onayla
+         SpeedSp : Real;   // Hiz referansi (rpm)
+         RefSpeed : Real := 1500.0;   // Referans hiz (surucu p2000 ile ayni olmali)
+         ConfigAxis : Word := 16#003F;   // SINA_SPEED ConfigAxis (varsayilan)
+      END_STRUCT;
+      Sts : Struct   // Senaryonun okudugu durum
+         AxisEnabled : Bool;   // Surucu calisiyor
+         Lockout : Bool;   // Devreye alma kilidi
+         ActVelocity : Real;   // Gercek hiz (rpm)
+         Error : Bool;   // Hata
+         Status : Word;   // SINA_SPEED durum kodu
+         DiagId : Word;   // Iletisim hata kodu
+      END_STRUCT;
+   END_STRUCT;
+END_TYPE

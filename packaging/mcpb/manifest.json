@@ -1,0 +1,50 @@
+{
+  "manifest_version": "0.3",
+  "name": "startwise",
+  "display_name": "StartWise for TIA Portal",
+  "version": "0.29.0",
+  "description": "Automation engineer's assistant for Siemens TIA Portal V21: hardware, networks, drives, field equipment, PLC blocks and HMI from plain language.",
+  "long_description": "StartWise drives Siemens TIA Portal V21 offline through the Openness API.\n\n- Hardware from article numbers (PLC, ET 200, SINAMICS drives, HMI panels, I/O modules), PROFINET networks, HMI connections\n- Drive preparation in one call: technology object, telegram, topology, control block and LAD network\n- Field equipment (valves, analog measurements) with FBs, tags and networks\n- SCL / LAD blocks, PLC alarms, HMI screens, compile, project archive\n- Learns unknown Openness operations by itself (API search + live object explorer)\n\nRequirements: Windows, TIA Portal V21 with STEP 7 (and Startdrive for drives), and the Windows user in the group \"Siemens TIA Openness\". Nothing is ever downloaded to a PLC; StartWise works offline only.\n\nOpen source (Apache-2.0): https://github.com/bilalkirtac/startwise",
+  "author": { "name": "Demory", "url": "https://github.com/bilalkirtac" },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/bilalkirtac/startwise",
+  "repository": { "type": "git", "url": "https://github.com/bilalkirtac/startwise" },
+  "icon": "icon.png",
+  "keywords": ["Siemens", "TIA Portal", "Openness", "PLC", "S7-1500", "SINAMICS", "HMI", "automation"],
+  "server": {
+    "type": "binary",
+    "entry_point": "server/TiaAssistant.exe",
+    "mcp_config": {
+      "command": "${__dirname}/server/TiaAssistant.exe",
+      "args": [],
+      "env": {
+        "TIA_API_DIR": "${user_config.tia_api_dir}"
+      }
+    }
+  },
+  "compatibility": {
+    "platforms": ["win32"]
+  },
+  "user_config": {
+    "tia_api_dir": {
+      "type": "directory",
+      "title": "TIA Openness API folder (optional)",
+      "description": "Only if TIA Portal V21 is installed in a non-standard place: the folder PublicAPI\\V21\\net48.",
+      "required": false,
+      "default": ""
+    }
+  },
+  "tools": [
+    { "name": "tia_connect", "description": "Connect to a running TIA Portal V21" },
+    { "name": "device_add", "description": "Add a PLC, ET 200, drive or HMI panel by article number" },
+    { "name": "network_connect", "description": "PROFINET / PROFIBUS networks and IO systems" },
+    { "name": "drive_prepare", "description": "Make a SINAMICS drive ready for scenario writing in one call" },
+    { "name": "equipment_prepare", "description": "Add field equipment such as valves and analog measurements" },
+    { "name": "hmi_connect", "description": "Integrated HMI-PLC connection" },
+    { "name": "hmi_unified_add", "description": "WinCC Unified: buttons, indicators, IO fields, trends, alarms bound to PLC values" },
+    { "name": "scl_import", "description": "Generate PLC blocks from SCL" },
+    { "name": "compile", "description": "Compile PLC and HMI offline" },
+    { "name": "api_search", "description": "Search the Openness API and hardware parameters" }
+  ],
+  "tools_generated": true
+}

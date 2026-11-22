@@ -1,0 +1,28 @@
+{
+  "name": "startwise",
+  "version": "0.34.0",
+  "description": "Siemens TIA Portal V21 assistant: hardware, networks, SINAMICS drives, field equipment, PLC blocks, alarms and HMI (classic and WinCC Unified) from plain language, offline through Openness.",
+  "author": {
+    "name": "Bilal Kirtac (Demory)",
+    "url": "https://github.com/bilalkirtac"
+  },
+  "homepage": "https://github.com/bilalkirtac/startwise",
+  "repository": "https://github.com/bilalkirtac/startwise",
+  "license": "Apache-2.0",
+  "keywords": [
+    "siemens",
+    "tia-portal",
+    "openness",
+    "plc",
+    "s7-1500",
+    "sinamics",
+    "wincc",
+    "automation"
+  ],
+  "mcpServers": "https://github.com/bilalkirtac/startwise/releases/download/v0.34.0/StartWise-0.34.0.mcpb",
+  "network": {
+    "hosts": [
+      "github.com"
+    ]
+  }
+}
