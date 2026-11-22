@@ -17,7 +17,7 @@ $manifest = Get-Content (Join-Path $PSScriptRoot 'mcpb\manifest.json') -Raw -Enc
 $manifest = [regex]::Replace($manifest, '"version"\s*:\s*"[^"]*"', ('"version": "' + $ver + '"'), 1)
 
 # Claude plugin: version and release URL of the bundled MCP server follow ServerVersion.
-$pj = Join-Path $root '.claude-plugin\plugin.json'
+$pj = Join-Path $root 'plugins\startwise\.claude-plugin\plugin.json'
 if (Test-Path $pj) {
     $p = Get-Content $pj -Raw -Encoding UTF8
     $p = [regex]::Replace($p, '"version"\s*:\s*"[^"]*"', ('"version": "' + $ver + '"'), 1)

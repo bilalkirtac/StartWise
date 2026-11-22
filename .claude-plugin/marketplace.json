@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "startwise",
-      "source": "./",
+      "source": "./plugins/startwise",
       "description": "Siemens TIA Portal V21 assistant: hardware, drives, field equipment, PLC blocks, alarms and HMI from plain language, offline through Openness."
     }
   ]

@@ -35,7 +35,7 @@ Then open TIA Portal V21 and tell Claude *"connect to TIA"*. On the first connec
 
 - `src/` – the MCP server (C#)
 - `knowledge/` – defaults, scenarios, equipment blocks (SCL) and the hardware-attribute index Claude reads while working; editable without rebuilding
-- `skills/startwise-tia/` – the skill that teaches Claude how to use the tools
+- `plugins/startwise/` – the Claude plugin (skill, manifest, icon); this folder is what the plugin directory reviews
 - `packaging/` – extension manifest, icon, installation guide (PDF)
 
 Siemens Openness assemblies are **not** part of this repository; they are loaded from your own TIA Portal installation.
