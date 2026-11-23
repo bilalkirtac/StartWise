@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -188,9 +188,11 @@ namespace TiaAssistant
                 if (t == null) return "CPU firmware V" + major + " needs a user with Full access, but this TIA version has no UMAC API. Set it in TIA: Security settings > Users and roles.";
                 Project p = Proj();
                 object cfg = p.GetType().GetMethods().First(x => x.Name == "GetService" && x.IsGenericMethodDefinition).MakeGenericMethod(t).Invoke(p, null);
+                // In a new project AnonymousUser is null until it is activated once.
                 object anon = t.GetProperty("AnonymousUser").GetValue(cfg, null);
-                bool active = (bool)anon.GetType().GetProperty("IsActive").GetValue(anon, null);
-                if (!active) t.GetMethod("ActivateAnonymousUser").Invoke(cfg, null);
+                bool active = anon != null && (bool)anon.GetType().GetProperty("IsActive").GetValue(anon, null);
+                if (!active) { t.GetMethod("ActivateAnonymousUser").Invoke(cfg, null); anon = t.GetProperty("AnonymousUser").GetValue(cfg, null); }
+                if (anon == null) return "Users and roles NOT set: anonymous user could not be activated - assign Full access in TIA.";
                 object roles = t.GetProperty("SystemRoles").GetValue(cfg, null);
                 object role = roles.GetType().GetMethod("Find", new[] { typeof(string) }).Invoke(roles, new object[] { "PLC administrator" });
                 if (role == null) return "Anonymous user activated; system role 'PLC administrator' not found - assign Full access in TIA.";

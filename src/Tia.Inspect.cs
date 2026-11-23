@@ -51,9 +51,14 @@ namespace TiaAssistant
             if (_serviceTypes != null) return _serviceTypes;
             List<Type> r = new List<Type>();
             Type svc = typeof(IEngineeringService);
-            Type[] all;
-            try { all = svc.Assembly.GetTypes(); } catch (ReflectionTypeLoadException ex) { all = ex.Types.Where(t => t != null).ToArray(); }
-            foreach (Type t in all) { try { if (t.IsPublic && !t.IsAbstract && svc.IsAssignableFrom(t) && t.IsClass) r.Add(t); } catch { } }
+            // V21 splits the API over several assemblies (Base, Step7, WinCC, ...): services live in all of them,
+            // e.g. SynchronousAxisMasterValues in Siemens.Engineering.Step7.
+            foreach (Assembly a in Program.SiemensAssemblies())
+            {
+                Type[] all;
+                try { all = a.GetTypes(); } catch (ReflectionTypeLoadException ex) { all = ex.Types.Where(t => t != null).ToArray(); }
+                foreach (Type t in all) { try { if (t.IsPublic && !t.IsAbstract && svc.IsAssignableFrom(t) && t.IsClass) r.Add(t); } catch { } }
+            }
             _serviceTypes = r;
             return r;
         }
