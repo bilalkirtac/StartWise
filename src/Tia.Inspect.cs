@@ -52,7 +52,7 @@ namespace TiaAssistant
             List<Type> r = new List<Type>();
             Type svc = typeof(IEngineeringService);
             // V21 splits the API over several assemblies (Base, Step7, WinCC, ...): services live in all of them,
-            // e.g. SynchronousAxisMasterValues in Siemens.Engineering.Step7.
+            // e.g. motion and library services in Siemens.Engineering.Step7.
             foreach (Assembly a in Program.SiemensAssemblies())
             {
                 Type[] all;
