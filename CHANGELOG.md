@@ -1,7 +1,7 @@
 # Değişiklik günlüğü — StartWise (eski adı TIA Assistant)
 
 ## 0.34.1 - 2026-11-23
-- object_inspect / object_invoke `service:` paths find services in every Openness assembly (V21 split API), e.g. `service:SynchronousAxisMasterValues` on a TO_SynchronousAxis (master value coupling).
+- object_inspect / object_invoke `service:` paths find services in every Openness assembly (V21 split API), not only in Siemens.Engineering.Base.
 - device_add: in a new project the UMAC anonymous user is null until activated; now activated first, so FW V4.x CPUs (incl. S7-1500T) get Full access again.
 
 ## 0.34.0 - 2026-11-22
