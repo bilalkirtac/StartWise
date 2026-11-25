@@ -5,9 +5,11 @@
 # so no unsigned StartWise exe is written to the user's disk. Plus manifest, icon and knowledge\ (without generators).
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
-# build.cmd is still the compile check: the package is only made from sources that build.
-$exe  = Join-Path $root 'bin\V21\TiaAssistant.exe'
-if (-not (Test-Path $exe)) { throw "Build first: $exe not found (run build.cmd)." }
+# Check exactly what ships: start.ps1 compiles src\*.cs in memory and runs the self test.
+# No exe is needed (antivirus may remove an unsigned bin\V21\TiaAssistant.exe).
+$check = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'start.ps1') --selftest 2>&1 | Out-String
+if ($LASTEXITCODE -ne 0) { throw "In-memory build / self test failed:`n$check" }
+Write-Host ('Self test (in-memory build): ' + $check.Trim())
 
 # Version from the source (ServerVersion) so the package and the exe always agree.
 $prog = Get-Content (Join-Path $root 'src\Program.cs') -Raw
