@@ -33,7 +33,7 @@ Then open TIA Portal V21 and tell Claude *"connect to TIA"*. On the first connec
 
 ## Build from source
 
-`build.cmd` compiles `src\*.cs` with the C# compiler that ships with Windows (.NET Framework 4.8), against the Openness assemblies of your TIA installation. No SDK or NuGet packages are needed. `pack.cmd` creates the `.mcpb` package in `dist\`.
+`pack.cmd` creates the `.mcpb` package in `dist\`: it compiles `src\*.cs` in memory with the C# compiler that ships with Windows (.NET Framework 4.8), against the Openness assemblies of your TIA installation, runs a self test and packs the sources with `start.ps1`. No SDK or NuGet packages are needed. `build.cmd` (optional) builds a standalone `bin\V21\TiaAssistant.exe` for development; an unsigned exe may be removed by antivirus software.
 
 - `src/` – the MCP server (C#)
 - `knowledge/` – defaults, scenarios, equipment blocks (SCL) and the hardware-attribute index Claude reads while working; editable without rebuilding
