@@ -29,9 +29,9 @@ foreach ($n in 'Base','Step7','WinCC','WinCC.Extension','WinCCUnified','Safety',
     if (Test-Path $f) { [void]$cp.ReferencedAssemblies.Add($f) }
 }
 
-$files = @(Get-ChildItem (Join-Path $src '*.cs') | ForEach-Object { $_.FullName })
+[string[]]$files = @(Get-ChildItem -Path $src -Filter '*.cs' -File | ForEach-Object { $_.FullName })
 $provider = New-Object Microsoft.CSharp.CSharpCodeProvider
-$res = $provider.CompileAssemblyFromFile($cp, $files)
+$res = $provider.CompileAssemblyFromFile($cp, [string[]]$files)
 $errs = @($res.Errors | Where-Object { -not $_.IsWarning })
 if ($errs.Count -gt 0) {
     foreach ($e in $errs) { [Console]::Error.WriteLine("$($e.FileName)($($e.Line)): $($e.ErrorText)") }
