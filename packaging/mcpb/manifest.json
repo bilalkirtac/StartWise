@@ -13,10 +13,10 @@
   "keywords": ["Siemens", "TIA Portal", "Openness", "PLC", "S7-1500", "SINAMICS", "HMI", "automation"],
   "server": {
     "type": "binary",
-    "entry_point": "server/TiaAssistant.exe",
+    "entry_point": "server/start.ps1",
     "mcp_config": {
-      "command": "${__dirname}/server/TiaAssistant.exe",
-      "args": [],
+      "command": "powershell.exe",
+      "args": ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", "${__dirname}/server/start.ps1"],
       "env": {
         "TIA_API_DIR": "${user_config.tia_api_dir}"
       }

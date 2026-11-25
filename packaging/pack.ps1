@@ -1,9 +1,11 @@
 # Packs StartWise as a Claude Desktop extension (.mcpb = zip with manifest.json at the root).
 # Run after build.cmd (V21):   powershell -ExecutionPolicy Bypass -File packaging\pack.ps1
 # Output: dist\StartWise-<version>.mcpb  -> double-click it (or drag it into Claude Desktop) to install.
-# No source code goes into the package: manifest, icon, the V21 exe and knowledge\ (without generators).
+# The package carries the C# sources and start.ps1: Windows PowerShell compiles them in memory at start-up,
+# so no unsigned StartWise exe is written to the user's disk. Plus manifest, icon and knowledge\ (without generators).
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
+# build.cmd is still the compile check: the package is only made from sources that build.
 $exe  = Join-Path $root 'bin\V21\TiaAssistant.exe'
 if (-not (Test-Path $exe)) { throw "Build first: $exe not found (run build.cmd)." }
 
@@ -44,7 +46,8 @@ try {
     Add-Entry (Join-Path $PSScriptRoot 'mcpb\icon.png') 'icon.png'
     $pdf = Join-Path $PSScriptRoot 'StartWise-Kurulum.pdf'
     if (Test-Path $pdf) { Add-Entry $pdf 'StartWise-Kurulum.pdf' }
-    Add-Entry $exe 'server/TiaAssistant.exe'
+    Add-Entry (Join-Path $PSScriptRoot 'start.ps1') 'server/start.ps1'
+    Get-ChildItem (Join-Path $root 'src') -Filter '*.cs' -File | ForEach-Object { Add-Entry $_.FullName ('server/src/' + $_.Name) }
 
     $k = Join-Path $root 'knowledge'
     Get-ChildItem $k -Recurse -File | Where-Object { $_.FullName -notmatch '\\generators\\' } | ForEach-Object {
@@ -62,7 +65,7 @@ Write-Host "PACKED: $out ($size KB, version $ver)"
 # SHA-256 checksums for the release page: users and IT can check that the files are the ones built here.
 # Format is the one 'sha256sum -c' reads: "<hash>  <file name>".
 $sums = Join-Path $dist "StartWise-$ver.sha256"
-$lines = foreach ($f in @($out, $exe)) {
+$lines = foreach ($f in @($out)) {
     (Get-FileHash -Algorithm SHA256 $f).Hash.ToLowerInvariant() + '  ' + (Split-Path $f -Leaf)
 }
 [System.IO.File]::WriteAllText($sums, (($lines -join "`n") + "`n"), (New-Object System.Text.UTF8Encoding($false)))
