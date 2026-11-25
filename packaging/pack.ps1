@@ -58,6 +58,17 @@ if (Test-Path (Join-Path $PSScriptRoot 'StartWise-Kurulum.pdf')) { Copy-Item (Jo
 
 $size = [math]::Round((Get-Item $out).Length / 1KB)
 Write-Host "PACKED: $out ($size KB, version $ver)"
+
+# SHA-256 checksums for the release page: users and IT can check that the files are the ones built here.
+# Format is the one 'sha256sum -c' reads: "<hash>  <file name>".
+$sums = Join-Path $dist "StartWise-$ver.sha256"
+$lines = foreach ($f in @($out, $exe)) {
+    (Get-FileHash -Algorithm SHA256 $f).Hash.ToLowerInvariant() + '  ' + (Split-Path $f -Leaf)
+}
+[System.IO.File]::WriteAllText($sums, (($lines -join "`n") + "`n"), (New-Object System.Text.UTF8Encoding($false)))
+Write-Host ''
+Write-Host "SHA-256 ($(Split-Path $sums -Leaf)):"
+$lines | ForEach-Object { Write-Host "  $_" }
 Write-Host 'Install: Claude Desktop > Settings > Extensions > Advanced settings > Install Extension... (see StartWise-Kurulum.pdf).'
-Write-Host ('Release: create GitHub release v' + $ver + ' and attach ' + (Split-Path $out -Leaf) + ' (the plugin downloads it from there).')
+Write-Host ('Release: create GitHub release v' + $ver + ' and attach ' + (Split-Path $out -Leaf) + ' and ' + (Split-Path $sums -Leaf) + '; paste the SHA-256 lines into the release notes.')
 Write-Host 'Before testing the package on this PC, remove the hand-made "startwise-v21" entry from claude_desktop_config.json, or the tools appear twice.'

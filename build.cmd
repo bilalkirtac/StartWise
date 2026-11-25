@@ -44,6 +44,7 @@ if exist "%OUT%\TiaAssistant.exe" ren "%OUT%\TiaAssistant.exe" TiaAssistant.old.
 if errorlevel 1 echo. & echo BUILD FAILED - copy the lines above to Claude. & exit /b 1
 
 echo BUILD OK (%VER%): %OUT%\TiaAssistant.exe  (StartWise)
+for /f "usebackq delims=" %%h in (`powershell -NoProfile -Command "(Get-FileHash -Algorithm SHA256 '%OUT%\TiaAssistant.exe').Hash.ToLower()"`) do echo SHA-256: %%h
 echo.
 echo Restart Claude now so it loads the new build.
 echo --- self test ---
