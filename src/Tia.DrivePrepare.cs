@@ -335,7 +335,12 @@ namespace TiaAssistant
                     string lib = null;
                     foreach (GlobalLibrary g in Portal().GlobalLibraries) if (g.Name.IndexOf("Drive_Lib", StringComparison.OrdinalIgnoreCase) >= 0) { lib = g.Name; break; }
                     if (lib == null) foreach (var info in Portal().GlobalLibraries.GetGlobalLibraryInfos()) if (info.Name.IndexOf("Drive_Lib", StringComparison.OrdinalIgnoreCase) >= 0) { lib = info.Name; break; }
-                    if (lib == null) throw new InvalidOperationException("SINA_SPEED is not in the PLC and no DriveLib global library is known. Open it with lib_open (path of the DriveLib folder or .al21) and call again. Nothing else was changed.");
+                    if (lib == null)
+                    {
+                        List<string> files = FindLibraryFiles("Drive_Lib");
+                        if (files.Count > 0) { lib = Portal().GlobalLibraries.Open(new FileInfo(files[0]), OpenMode.ReadOnly).Name; step("DriveLib", "opened", files[0] + " (read-only)"); }
+                    }
+                    if (lib == null) throw new InvalidOperationException("SINA_SPEED is not in the PLC and no DriveLib was found (open ones, Documents\\Automation). Open it with lib_open (path of the DriveLib folder or .al21) and call again. Nothing else was changed.");
                     LibCopyBlock(plcName, lib, "SINA_SPEED", null);
                     step("SINA_SPEED", "copied", "from " + lib);
                 }

@@ -2,7 +2,8 @@
 
 ## 0.36.0 - 2026-11-25
 - New tool `lib_open`: opens a global library from its .al21 file or folder (read-only), e.g. Siemens DriveLib or a company library; then `lib_list`, `lib_copy_block` and `drive_prepare` can use it.
-- drive_prepare finds an opened DriveLib among the open global libraries too.
+- lib_open without a path searches Documents\Automation (TIA's default folder, also when Documents is redirected, e.g. to OneDrive) for *.al21, filtered by name.
+- drive_prepare finds an opened DriveLib, or opens Drive_Lib*.al21 from Documents\Automation by itself (read-only).
 
 ## 0.35.0 - 2026-11-25
 - The extension no longer ships an exe: Claude starts `powershell.exe` (signed by Microsoft) with `server/start.ps1`, which compiles `server/src/*.cs` in memory with the .NET Framework C# compiler and runs the server. An unsigned, newly built exe was flagged heuristically by antivirus (Symantec Heur.AdvML.C / Trojan.Gen.9) and removed from the extension folder. Start-up time is unchanged in practice.

@@ -688,10 +688,12 @@ namespace TiaAssistant
 
             Add("lib_open",
                 "Open a global library from a file (.al21) or a folder that contains one, read-only, e.g. Siemens DriveLib or a company library. " +
-                "Afterwards lib_list shows it and lib_copy_block / drive_prepare can use its blocks. The library itself is never changed.",
-                Schema(new string[] { "path" },
-                    "path", P("string", "Path of the .al21 file or of its folder, e.g. C:\\Users\\me\\Documents\\Automation\\Drive_Lib_S7_1200_1500_V21")),
-                delegate(Dictionary<string, object> a) { return Tia.LibOpen(U.Str(a, "path", true)); });
+                "Afterwards lib_list shows it and lib_copy_block / drive_prepare can use its blocks. The library itself is never changed. " +
+                "Without 'path' it searches Documents\\Automation (TIA's default folder) for *.al21, filtered by 'name'; without both it lists what it finds.",
+                Schema(none,
+                    "path", P("string", "Path of the .al21 file or of its folder. Optional"),
+                    "name", P("string", "Part of the library name to search for, e.g. Drive_Lib. Optional")),
+                delegate(Dictionary<string, object> a) { return Tia.LibOpen(U.Str(a, "path", false), U.Str(a, "name", false)); });
 
             Add("lib_copy_block",
                 "Copy a PLC block (e.g. SINA_SPEED) from a library type or master copy into a PLC. For types the default (or newest) version is used unless 'version' is given. " +

@@ -55,9 +55,44 @@ namespace TiaAssistant
 
         // Open a global library file (.al21 or a folder that holds one) so lib_list / lib_copy_block / drive_prepare can use it.
         // Read-only: StartWise never changes the library itself.
-        public static object LibOpen(string path)
+        // Global library files (*.al21) under Documents\Automation, TIA's default folder for projects and libraries.
+        // Searched a few levels deep; folders that cannot be read are skipped.
+        public static List<string> FindLibraryFiles(string nameFilter)
+        {
+            List<string> found = new List<string>();
+            string root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Automation");
+            if (!Directory.Exists(root)) return found;
+            Queue<KeyValuePair<string, int>> q = new Queue<KeyValuePair<string, int>>();
+            q.Enqueue(new KeyValuePair<string, int>(root, 0));
+            while (q.Count > 0 && found.Count < 50)
+            {
+                KeyValuePair<string, int> cur = q.Dequeue();
+                try
+                {
+                    foreach (string f in Directory.GetFiles(cur.Key, "*.al21"))
+                        if (string.IsNullOrEmpty(nameFilter) || Path.GetFileNameWithoutExtension(f).IndexOf(nameFilter, StringComparison.OrdinalIgnoreCase) >= 0) found.Add(f);
+                    if (cur.Value < 3)
+                        foreach (string d in Directory.GetDirectories(cur.Key)) q.Enqueue(new KeyValuePair<string, int>(d, cur.Value + 1));
+                }
+                catch (UnauthorizedAccessException) { }
+                catch (IOException) { }
+            }
+            return found;
+        }
+
+        public static object LibOpen(string path, string name)
         {
             TiaPortal tia = Portal();
+            if (string.IsNullOrEmpty(path))
+            {
+                List<string> hits = FindLibraryFiles(name);
+                if (hits.Count == 0)
+                    throw new InvalidOperationException("No global library (*.al21)" + (string.IsNullOrEmpty(name) ? "" : " matching '" + name + "'") +
+                        " found under Documents\\Automation. Give its path.");
+                if (hits.Count > 1 && string.IsNullOrEmpty(name))
+                    return U.Obj("found", hits, "note", "Several libraries found. Call lib_open again with 'name' or 'path' to open one.");
+                path = hits[0];
+            }
             string file = path;
             if (Directory.Exists(path))
             {
