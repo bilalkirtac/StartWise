@@ -1,5 +1,10 @@
 # Değişiklik günlüğü — StartWise (eski adı TIA Assistant)
 
+## 0.35.0 - 2026-11-25
+- The extension no longer ships an exe: Claude starts `powershell.exe` (signed by Microsoft) with `server/start.ps1`, which compiles `server/src/*.cs` in memory with the .NET Framework C# compiler and runs the server. An unsigned, newly built exe was flagged heuristically by antivirus (Symantec Heur.AdvML.C / Trojan.Gen.9) and removed from the extension folder. Start-up time is unchanged in practice.
+- `STARTWISE_HOME` (set by start.ps1) tells the server where its log and knowledge folder are; the exe build still works as before.
+- build.cmd prints the exe SHA-256; pack.ps1 writes `StartWise-<version>.sha256` for the release page.
+
 ## 0.34.1 - 2026-11-23
 - object_inspect / object_invoke `service:` paths find services in every Openness assembly (V21 split API), not only in Siemens.Engineering.Base.
 - device_add: in a new project the UMAC anonymous user is null until activated; now activated first, so FW V4.x CPUs (incl. S7-1500T) get Full access again.

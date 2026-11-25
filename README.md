@@ -27,7 +27,7 @@ StartWise has two parts. Install both:
 1. **The tools (Claude Desktop extension).** Download `StartWise-<version>.mcpb` from the [Releases](https://github.com/bilalkirtac/startwise/releases) page, then Claude Desktop → Settings → Extensions → Advanced settings → **Install Extension…**. This is the local server that talks to TIA Portal.
 2. **The skill (Claude plugin).** Settings → Plugins → Add → marketplace `bilalkirtac/StartWise`, then install **startwise**. It teaches Claude the rules and workflows for TIA Portal (defaults, confirmations, which tool for which job).
 
-**Check the download (optional).** Each release lists the SHA-256 checksums of the `.mcpb` and of `TiaAssistant.exe` (also in `StartWise-<version>.sha256`). In PowerShell: `Get-FileHash .\StartWise-<version>.mcpb` and compare. The exe is not code-signed yet, so some antivirus products flag it heuristically as unknown; the checksum shows it is the published build.
+**Check the download (optional).** Each release lists the SHA-256 checksum of the `.mcpb` (also in `StartWise-<version>.sha256`). In PowerShell: `Get-FileHash .\StartWise-<version>.mcpb` and compare. The package contains no exe: Claude starts Windows PowerShell, which compiles the C# sources from the package in memory and runs the server.
 
 Then open TIA Portal V21 and tell Claude *"connect to TIA"*. On the first connection TIA Portal asks to allow Openness access: choose **Yes to all**. A Turkish installation guide is in [docs/KURULUM.md](docs/KURULUM.md).
 
