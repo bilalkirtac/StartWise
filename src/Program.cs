@@ -217,11 +217,20 @@ namespace TiaAssistant
 
         // ---------- log (never stdout: stdout is protocol only) ----------
 
+        // Folder of the server: the exe's folder, or STARTWISE_HOME when the server is compiled in memory by start.ps1
+        // (an in-memory assembly has no Location).
+        public static string HomeDir()
+        {
+            string h = Environment.GetEnvironmentVariable("STARTWISE_HOME");
+            if (!string.IsNullOrEmpty(h)) return h;
+            return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        }
+
         static void OpenLog()
         {
             try
             {
-                string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string dir = HomeDir();
                 _log = new StreamWriter(Path.Combine(dir, "startwise.log"), true, new UTF8Encoding(false));
                 _log.AutoFlush = true;
             }
@@ -272,7 +281,7 @@ namespace TiaAssistant
         // Searched upwards, so bin\TiaAssistant.exe (V18) and bin\V21\TiaAssistant.exe share one knowledge folder.
         public static string KnowledgeDir()
         {
-            string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string dir = Program.HomeDir();
             for (string d = Path.GetDirectoryName(dir); d != null; d = Path.GetDirectoryName(d))
                 if (Directory.Exists(Path.Combine(d, "knowledge"))) return Path.Combine(d, "knowledge");
             return Path.Combine(Path.GetDirectoryName(dir) ?? dir, "knowledge");
