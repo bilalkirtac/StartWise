@@ -18,7 +18,8 @@
       "command": "powershell.exe",
       "args": ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", "${__dirname}/server/start.ps1"],
       "env": {
-        "TIA_API_DIR": "${user_config.tia_api_dir}"
+        "TIA_API_DIR": "${user_config.tia_api_dir}",
+        "STARTWISE_SRC": "${user_config.dev_source_dir}"
       }
     }
   },
@@ -30,6 +31,13 @@
       "type": "directory",
       "title": "TIA Openness API folder (optional)",
       "description": "Only if TIA Portal V21 is installed in a non-standard place: the folder PublicAPI\\V21\\net48.",
+      "required": false,
+      "default": ""
+    },
+    "dev_source_dir": {
+      "type": "directory",
+      "title": "Development source folder (optional)",
+      "description": "For StartWise development only: the repository folder (contains src\\ and knowledge\\). StartWise is then compiled from there at every start, so a restart of Claude picks up changes without a new package.",
       "required": false,
       "default": ""
     }

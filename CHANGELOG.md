@@ -3,6 +3,7 @@
 ## 0.36.0 - 2026-11-25
 - New tool `lib_open`: opens a global library from its .al21 file or folder (read-only), e.g. Siemens DriveLib or a company library; then `lib_list`, `lib_copy_block` and `drive_prepare` can use it.
 - lib_open without a path searches Documents\Automation (TIA's default folder, also when Documents is redirected, e.g. to OneDrive) for *.al21, filtered by name.
+- Extension setting "Development source folder" (STARTWISE_SRC): start.ps1 compiles that repository's src\ and uses its knowledge\, so a Claude restart picks up changes without a new package.
 - drive_prepare finds an opened DriveLib, or opens Drive_Lib*.al21 from Documents\Automation by itself (read-only).
 
 ## 0.35.0 - 2026-11-25

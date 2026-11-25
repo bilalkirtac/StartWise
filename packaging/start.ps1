@@ -10,6 +10,13 @@ $src = Join-Path $here 'src'
 if (-not (Test-Path $src)) { $src = Join-Path (Split-Path -Parent $here) 'src' }
 $env:STARTWISE_HOME = $here
 
+# Development: STARTWISE_SRC = repository folder -> compile its src\ and use its knowledge\ (restart Claude to pick up changes).
+$dev = $env:STARTWISE_SRC
+if ($dev -and (Test-Path (Join-Path $dev 'src'))) {
+    $src = Join-Path $dev 'src'
+    $env:STARTWISE_HOME = Join-Path $dev 'packaging'   # knowledge\ is searched from the parent folder upwards
+}
+
 $api = $env:TIA_API_DIR
 if (-not $api) { $api = Join-Path $env:ProgramFiles 'Siemens\Automation\Portal V21\PublicAPI\V21\net48' }
 
