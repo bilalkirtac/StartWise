@@ -13,7 +13,7 @@ namespace TiaAssistant
 {
     public static class Program
     {
-        public const string ServerVersion = "0.35.0";
+        public const string ServerVersion = "0.36.0";
 #if TIA_V18
         public const string TiaMajor = "18";
 #else

@@ -7,6 +7,7 @@ using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
 using Siemens.Engineering;
+using Siemens.Engineering.Library;
 using Siemens.Engineering.Compiler;
 using Siemens.Engineering.HW;
 using Siemens.Engineering.HW.Features;
@@ -332,8 +333,9 @@ namespace TiaAssistant
                 if (!BlockExists(plc, "SINA_SPEED"))
                 {
                     string lib = null;
-                    foreach (var info in Portal().GlobalLibraries.GetGlobalLibraryInfos()) if (info.Name.IndexOf("Drive_Lib", StringComparison.OrdinalIgnoreCase) >= 0) { lib = info.Name; break; }
-                    if (lib == null) throw new InvalidOperationException("SINA_SPEED is not in the PLC and no DriveLib global library is known. Open DriveLib in TIA (Libraries) and call again. Nothing else was changed.");
+                    foreach (GlobalLibrary g in Portal().GlobalLibraries) if (g.Name.IndexOf("Drive_Lib", StringComparison.OrdinalIgnoreCase) >= 0) { lib = g.Name; break; }
+                    if (lib == null) foreach (var info in Portal().GlobalLibraries.GetGlobalLibraryInfos()) if (info.Name.IndexOf("Drive_Lib", StringComparison.OrdinalIgnoreCase) >= 0) { lib = info.Name; break; }
+                    if (lib == null) throw new InvalidOperationException("SINA_SPEED is not in the PLC and no DriveLib global library is known. Open it with lib_open (path of the DriveLib folder or .al21) and call again. Nothing else was changed.");
                     LibCopyBlock(plcName, lib, "SINA_SPEED", null);
                     step("SINA_SPEED", "copied", "from " + lib);
                 }

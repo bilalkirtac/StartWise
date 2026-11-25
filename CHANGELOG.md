@@ -1,5 +1,9 @@
 # Değişiklik günlüğü — StartWise (eski adı TIA Assistant)
 
+## 0.36.0 - 2026-11-25
+- New tool `lib_open`: opens a global library from its .al21 file or folder (read-only), e.g. Siemens DriveLib or a company library; then `lib_list`, `lib_copy_block` and `drive_prepare` can use it.
+- drive_prepare finds an opened DriveLib among the open global libraries too.
+
 ## 0.35.0 - 2026-11-25
 - The extension no longer ships an exe: Claude starts `powershell.exe` (signed by Microsoft) with `server/start.ps1`, which compiles `server/src/*.cs` in memory with the .NET Framework C# compiler and runs the server. An unsigned, newly built exe was flagged heuristically by antivirus (Symantec Heur.AdvML.C / Trojan.Gen.9) and removed from the extension folder. Start-up time is unchanged in practice.
 - `STARTWISE_HOME` (set by start.ps1) tells the server where its log and knowledge folder are; the exe build still works as before.

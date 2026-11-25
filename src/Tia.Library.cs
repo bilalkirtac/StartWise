@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using Siemens.Engineering;
@@ -50,6 +51,31 @@ namespace TiaAssistant
                     return tia.GlobalLibraries.Open(i);
                 }
             return null;
+        }
+
+        // Open a global library file (.al21 or a folder that holds one) so lib_list / lib_copy_block / drive_prepare can use it.
+        // Read-only: StartWise never changes the library itself.
+        public static object LibOpen(string path)
+        {
+            TiaPortal tia = Portal();
+            string file = path;
+            if (Directory.Exists(path))
+            {
+                string[] hits = Directory.GetFiles(path, "*.al21", SearchOption.AllDirectories);
+                if (hits.Length == 0)
+                {
+                    string[] older = Directory.GetFiles(path, "*.al*", SearchOption.AllDirectories);
+                    throw new InvalidOperationException("No V21 library (*.al21) under '" + path + "'." +
+                        (older.Length > 0 ? " Found " + Path.GetFileName(older[0]) + ": an older library must be upgraded in TIA V21 first (open it there once and confirm the upgrade)." : ""));
+                }
+                file = hits[0];
+            }
+            if (!File.Exists(file)) throw new InvalidOperationException("Library file not found: " + file);
+            foreach (GlobalLibrary g in tia.GlobalLibraries)
+                if (g.Path != null && string.Equals(g.Path.FullName, file, StringComparison.OrdinalIgnoreCase))
+                    return U.Obj("library", g.Name, "path", file, "already_open", true);
+            GlobalLibrary lib = tia.GlobalLibraries.Open(new FileInfo(file), OpenMode.ReadOnly);
+            return U.Obj("library", lib.Name, "path", file, "opened", "read-only", "next", "lib_list library='" + lib.Name + "' to see its types and master copies");
         }
 
         public static object LibList(string library, string filter, int limit)
