@@ -114,6 +114,38 @@ namespace TiaAssistant
             return U.Obj("contents", contents);
         }
 
+        // Tool access for clients without the skills extension (Claude Desktop today): skill_list / skill_get.
+        public static object ToolList()
+        {
+            ArrayList list = new ArrayList();
+            string root = Root();
+            foreach (string d in SkillDirs())
+            {
+                Dictionary<string, object> fm = Frontmatter(Path.Combine(d, "SKILL.md"));
+                ArrayList files = new ArrayList();
+                foreach (string f in Directory.GetFiles(d, "*", SearchOption.AllDirectories)) files.Add(Rel(d, f));
+                object n, ds; fm.TryGetValue("name", out n); fm.TryGetValue("description", out ds);
+                list.Add(U.Obj("name", n ?? Path.GetFileName(d), "description", ds, "path", Rel(root, d), "files", files));
+            }
+            return U.Obj("skills", list, "note", list.Count == 0 ? "No skills folder found." : "Read a skill with skill_get before starting that kind of job.");
+        }
+
+        public static object ToolGet(string name, string file)
+        {
+            string dir = null;
+            foreach (string d in SkillDirs())
+            {
+                object n; Frontmatter(Path.Combine(d, "SKILL.md")).TryGetValue("name", out n);
+                if (string.Equals(n as string, name, StringComparison.OrdinalIgnoreCase) || string.Equals(Rel(Root(), d), name, StringComparison.OrdinalIgnoreCase)) { dir = d; break; }
+            }
+            if (dir == null) throw new InvalidOperationException("Unknown skill '" + name + "'. Call skill_list.");
+            string rel = string.IsNullOrEmpty(file) ? "SKILL.md" : file.Replace('\\', '/').TrimStart('/');
+            string uri = "skill://" + Rel(Root(), dir) + "/" + rel;
+            string f = FileOf(uri);
+            if (f == null) throw new InvalidOperationException("No file '" + rel + "' in skill '" + name + "'.");
+            return U.Obj("skill", name, "file", rel, "uri", uri, "content", File.ReadAllText(f, Encoding.UTF8));
+        }
+
         // resources/list: the SKILL.md of each skill (supporting files are reached from the skill entry).
         public static object ResourceList()
         {

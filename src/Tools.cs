@@ -18,6 +18,7 @@ namespace TiaAssistant
     {
         public const string Instructions =
             "StartWise (formerly TIA Assistant) drives Siemens TIA Portal " + Program.TiaName + " offline through the Openness API. " +
+            "SKILLS: call skill_list once per conversation and read (skill_get) the skill that matches the job before you start it - skill 'startwise-tia' holds the ground rules; follow the skills. " +
             "FIRST: call scenario_get with name 'defaults', then scenario_list; before handling a kind of equipment read its scenario and follow it instead of asking the engineer things it already answers. " +
             "Typical flow: tia_connect -> project_create or project_open -> for each hardware row of the equipment list: " +
             "device_add (CPUs, interface modules, drives, HMIs) and module_plug (rack modules), using the MLFB from the list -> " +
@@ -99,6 +100,19 @@ namespace TiaAssistant
                 "Read-only. Lists the engineer's own working rules: 'defaults' (house defaults that apply to everything) and the scenarios (step-by-step procedures per kind of equipment).",
                 Schema(none),
                 delegate(Dictionary<string, object> a) { return U.KnowledgeList(); });
+
+            Add("skill_list",
+                "Read-only. Lists the skills this server ships (name, description, files). A skill is a workflow with rules and steps; " +
+                "read the one that fits the job with skill_get before starting it. The same skills are also served over MCP (skill:// resources) to clients that support it.",
+                Schema(none),
+                delegate(Dictionary<string, object> a) { return Skills.ToolList(); });
+
+            Add("skill_get",
+                "Read-only. Returns a skill's SKILL.md, or one of its supporting files ('file', a path relative to the skill, e.g. references/drives.md). Follow the instructions in it.",
+                Schema(new string[] { "name" },
+                    "name", P("string", "Skill name from skill_list, e.g. startwise-tia"),
+                    "file", P("string", "Supporting file relative to the skill folder. Optional; default SKILL.md")),
+                delegate(Dictionary<string, object> a) { return Skills.ToolGet(U.Str(a, "name", true), U.Str(a, "file", false)); });
 
             Add("scenario_get",
                 "Read-only. Returns one document from scenario_list, e.g. 'defaults' or 'scenarios/drive-g120c'. " +
