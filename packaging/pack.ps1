@@ -51,8 +51,9 @@ try {
     Add-Entry (Join-Path $PSScriptRoot 'start.ps1') 'server/start.ps1'
     Get-ChildItem (Join-Path $root 'src') -Filter '*.cs' -File | ForEach-Object { Add-Entry $_.FullName ('server/src/' + $_.Name) }
 
+    # knowledge\private\ = closed, customer-based content (S120, sync, customer_lib): never packaged
     $k = Join-Path $root 'knowledge'
-    Get-ChildItem $k -Recurse -File | Where-Object { $_.FullName -notmatch '\\generators\\' } | ForEach-Object {
+    Get-ChildItem $k -Recurse -File | Where-Object { $_.FullName -notmatch '\\generators\\' -and $_.FullName -notmatch '\\private\\' } | ForEach-Object {
         Add-Entry $_.FullName ('knowledge/' + $_.FullName.Substring($k.Length + 1))
     }
 

@@ -1,6 +1,6 @@
 # Senaryo: Elektrik projesinden (Eplan / AutoCAD Electrical) donanım ve tag table
 
-Durum: TIA Portal V18'de denendi (13.11.2026, örnek bir 6 sayfalık Eplan PDF'i, CPU 1214C, 14 DI / 10 DQ / 2 AI, 26 tag, 0 hata). Adresler `io_addresses` ile TIA'dan okunarak doğrulandı ve 26 tag'e yorum yazıldı (0.7.0).
+Durum: TIA Portal V18'de denendi (13.11.2026, `fromEplan` projesi; DENS_G140, 6 sayfa PDF, CPU 1214C, 14 DI / 10 DQ / 2 AI, 26 tag, 0 hata). Adresler `io_addresses` ile TIA'dan okunarak doğrulandı ve 26 tag'e yorum yazıldı (0.7.0).
 
 ## Ne zaman
 

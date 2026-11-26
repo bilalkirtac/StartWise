@@ -1,41 +1,77 @@
-# StartWise for TIA Portal — Kurulum (kullanıcı için)
+# Kurulum
 
-StartWise, Claude'un TIA Portal V21'i senin bilgisayarında, çevrimdışı (offline) olarak kullanmasını sağlayan bir eklentidir. Donanım, ağ, sürücü, PLC blokları ve HMI işlerini düz cümleyle yaptırırsın. PLC'ye asla yükleme (download) yapmaz.
+## Ön koşullar
 
-## 1. Gereklilikler
+- TIA Portal V18 ve TIA Openness kurulu.
+- Windows kullanıcısı `Siemens TIA Openness` yerel grubuna üye. Gruba eklendikten sonra oturumu kapatıp açmak gerekir.
+- Claude masaüstü uygulaması.
 
-| Ne | Neden |
+Ek bir derleyici, SDK veya paket gerekmez.
+
+## İlk kurulum
+
+1. `build.cmd` dosyasını çalıştır. Sonunda `BUILD OK` ve bir öz-test çıktısı görünmeli; `api_dir` satırı `...\PublicAPI\V18` ile bitmeli.
+2. Claude'da Settings → Developer → Edit Config ile `claude_desktop_config.json` dosyasını aç. `"mcpServers": {` satırının hemen altına şunu ekle (sondaki virgül, arkasından başka girdi geliyorsa gerekir):
+
+```json
+    "startwise": {
+      "command": "C:\\Users\\bilal\\source\\repos\\tia-assistant\\bin\\TiaAssistant.exe"
+    },
+```
+
+3. Claude'u sistem tepsisinden Quit ile kapatıp yeniden aç. Developer sayfasında `startwise` "running" görünmeli.
+4. TIA Portal V18'i aç ve Claude'a "TIA'ya bağlan" de. TIA bir Openness erişim penceresi gösterir; "Yes to all" seç.
+
+## TIA Assistant → StartWise geçişi (17.11.2026)
+
+Eski ayardaki `"tia-assistant"` girdisini yukarıdaki `"startwise"` girdisiyle **değiştir** (ikisini birlikte bırakma; aynı araçlar iki kez görünür). Exe dosyasının adı `TiaAssistant.exe` olarak kalır (yeni adlı exe Norton tarafından engellendi; `bin` klasörü Norton'da istisna olarak eklendi). Claude'da görünen ad config anahtarından gelir. Yeni exe için TIA erişim penceresi bir kez daha çıkabilir. Senaryolar, belgeler ve TIA projeleri bu değişiklikten etkilenmez.
+
+## TIA V21 (19.11.2026)
+
+V21'de Openness TIA ile birlikte kurulur (kurulumda ayrı seçenek yok). Startdrive V21 API'si aynı klasöre gelir.
+
+1. `build.cmd V21` → `bin\V21\TiaAssistant.exe`. (`build.cmd` tek başına V18 build'ini yapar; ikisi yan yana durur.)
+2. Claude ayarına ikinci bir girdi ekle (V18 girdisi kalır):
+
+```json
+    "startwise-v21": {
+      "command": "C:\\Users\\bilal\\source\\repos\\tia-assistant\\bin\\V21\\TiaAssistant.exe"
+    },
+```
+
+3. Claude'u Quit ile kapatıp aç. V21 araçları `startwise-v21` altında görünür; her exe yalnız kendi TIA sürümüne bağlanır.
+
+## Kod değiştikten sonra
+
+1. `build.cmd` dosyasını çalıştır. Claude açık kalabilir; betik çalışan exe'yi `.old.exe` olarak kenara alır.
+2. Claude'u sistem tepsisinden Quit ile kapatıp yeniden aç. Pencereyi kapatmak yetmez.
+3. Yeniden derlenen exe için TIA erişim penceresi bir kez daha çıkabilir.
+
+`knowledge/` altındaki dosyaları değiştirmek için derleme veya yeniden başlatma gerekmez.
+
+## Sorun giderme
+
+| Belirti | Neden ve çözüm |
 |---|---|
-| **Windows 10/11 (64 bit)** | TIA Portal ve Openness yalnızca Windows'ta çalışır. |
-| **Claude Desktop (Windows uygulaması)** | StartWise bilgisayarında çalışan yerel bir eklentidir (local MCP). Tarayıcıdaki claude.ai veya telefon uygulaması bilgisayarındaki TIA'ya erişemez. |
-| **Ücretli Claude planı (Pro, Max, Team veya Enterprise) önerilir** | Bir TIA işi (cihaz ekleme, sürücü hazırlama, HMI) çok sayıda araç çağrısı ve uzun cevap kullanır; ücretsiz planın kullanım limiti kısa sürede dolar. Team/Enterprise'da eklentilere yöneticinin izin vermesi gerekebilir. |
-| **TIA Portal V21** (STEP 7) | StartWise, TIA'nın programlama arayüzü Openness ile çalışır. Openness V21 ile birlikte kurulur; ayrı kurulum gerekmez. |
-| **Geçerli TIA lisansları** | Openness, TIA'da elle yapabildiğin işleri yapar; lisansın izin vermediğini StartWise de yapamaz. S7-1200 için STEP 7 Basic yeterlidir; S7-1500, ET 200 ve sürücü projeleri için **STEP 7 Professional**, sürücüler için **Startdrive**, klasik paneller için **WinCC Comfort/Advanced**, Unified paneller için **WinCC Unified** gerekir. |
-| **Windows kullanıcın "Siemens TIA Openness" grubunda** | Siemens, Openness'e yalnızca bu gruptaki kullanıcıların erişmesine izin verir. TIA kurulumu grubu oluşturur; kullanıcıyı eklemek için: Bilgisayar Yönetimi → Yerel Kullanıcılar ve Gruplar → Gruplar → "Siemens TIA Openness" → Ekle. Sonra Windows oturumunu kapatıp aç. |
+| Claude açılışta "Couldn't load app settings" diyor | `claude_desktop_config.json` geçersiz. Girdi `mcpServers` bloğunun içinde olmalı; virgülleri kontrol et |
+| `tia_status` eski sürümü gösteriyor | Claude yeniden başlamamış. Sistem tepsisinden Quit et |
+| Yeni araç görünmüyor | Aynı neden; ayrıca derlemenin `BUILD OK` verdiğini doğrula |
+| `EngineeringSecurityException` | Kullanıcı Openness grubunda değil ya da TIA erişim penceresi reddedilmiş |
+| `api_dir` V18 dışında bir klasör gösteriyor | `TIA_API_DIR` ortam değişkenini `...\Portal V18\PublicAPI\V18` olarak ayarla |
 
-## 2. Kurulum
+Günlük dosyası: `bin\startwise.log` (0.18.0 öncesi: `bin\tia-assistant.log`). Her araç çağrısı ve sonucu buraya yazılır.
 
-StartWise iki parçadan oluşur, ikisini de kur:
+## Kurulum paketi (.mcpb) — 20.11.2026
 
-**1. Araçlar (Claude Desktop uzantısı)** — TIA Portal ile konuşan yerel sunucu:
+1. `build.cmd` (V21), sonra `pack.cmd` → `dist\StartWise-<sürüm>.mcpb`.
+2. Hedef bilgisayarda: dosyaya çift tıkla ya da Claude Desktop penceresine sürükle (Ayarlar > Eklentiler). Claude kurulum ekranını açar; lisans anahtarı boş bırakılabilir.
+3. Ön koşullar: TIA Portal V21 + STEP 7 (sürücüler için Startdrive), Windows kullanıcısı "Siemens TIA Openness" grubunda.
+4. Geliştirme bilgisayarında paketi denemeden önce claude_desktop_config.json'daki elle eklenmiş "startwise-v21" girdisini kaldır; yoksa araçlar iki kez görünür.
+5. Paket imzasız; antivirüs exe'yi işaretlerse istisna gerekir. Herkese açık dağıtımda kod imzalama eklenecek.
 
-1. [Releases](https://github.com/bilalkirtac/startwise/releases) sayfasından `StartWise-<sürüm>.mcpb` dosyasını indir.
-2. Claude Desktop → **Settings → Extensions** (yeni görünümde **Settings → Desktop app → Extensions → Manage**) → **Advanced settings** → **Install Extension…** → dosyayı seç → **Install**.
-   (Dosyaya çift tıklamak bazı bilgisayarlarda Windows'un "uygulama seç" penceresini açar; o durumda bu yolu kullan.)
 
-**2. Beceri (Claude eklentisi)** — Claude'a TIA kurallarını ve iş akışlarını öğretir:
-
-1. Claude → **Settings → Plugins → Add** → marketplace: `bilalkirtac/StartWise` → **Sync**.
-2. Listede **startwise** eklentisini kur.
-
-Sonra Claude'u yeniden başlat, TIA Portal V21'i aç ve Claude'a "TIA'ya bağlan" de. İlk bağlantıda TIA bir Openness erişim onayı sorar → **Yes to all**.
-
-## 3. Açık kaynak
-
-StartWise Apache 2.0 lisanslı, ücretsiz ve açık kaynaktır: https://github.com/bilalkirtac/startwise. Hata bildirimi ve öneriler için GitHub'da "Issues" bölümünü kullan ya da yaz: **bilal.kirtac@gmail.com**
-
-## 4. Sorun giderme
-
-- **"Openness group" / erişim reddedildi**: kullanıcı "Siemens TIA Openness" grubunda değil ya da gruba ekledikten sonra oturum kapatılıp açılmadı.
-- **Cihaz eklerken lisans hatası**: ilgili TIA lisansı (STEP 7 Professional, WinCC ...) yok veya Automation License Manager'da etkin değil.
-- **Antivirüs uyarısı**: StartWise henüz dijital imzalı değil. Dosyayı yalnızca GitHub Releases sayfasından indir; şüphen varsa kaynak koddan kendin derleyebilirsin (`build.cmd`).
+## Deneme sürümü ve lisans (0.33.0)
+- Kurulum: `StartWise-<sürüm>.mcpb` dosyasına çift tıkla (veya Claude Desktop > Settings > Extensions'a sürükle) > Install. Lisans alanı boş = deneme.
+- Deneme: StartWise en fazla 3 farklı TIA projesinde değişiklik yapar. Okuma araçları (inceleme, arama, derleme, dışa aktarma) her zaman çalışır. Sayılan projelerde çalışmaya devam eder.
+- Lisans: anahtarı uzantının "License key" alanına gir ya da Claude'a "bu lisans anahtarını etkinleştir: SW1...." de (license_activate). Durum: tia_status > license.
+- Ön koşullar: Windows, TIA Portal V21 (STEP 7; sürücüler için Startdrive; Unified için WinCC Unified), Windows kullanıcısı "Siemens TIA Openness" grubunda.

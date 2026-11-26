@@ -5,7 +5,7 @@ Doğrulandı: 18.11.2026, TIA V18, test_MCP. S210 7 kW 6SL5310-1BE17-0xFx V6.1 (
 ## Adımlar
 1. Sürücü: device_add (type_identifier katalogdan; S210 en fazla 7 kW). network_connect io_controller=<PLC>.
    Ana telegram varsayılan 105 (DSC, tork azaltma, 1 enkoder) — TO için doğru; drive_telegram ile kontrol.
-2. TO sürümü CPU firmware'ine bağlı: object_inspect <CPU> filter=Firmware. FW V2.9 → TO V6.0 (V7.0 geçersiz).
+2. TO sürümü CPU firmware'ine bağlı: object_inspect <CPU> filter=Firmware. FW V2.9 → TO V6.0 (V7.0 geçersiz). (manisa_V18'de V5.0.)
 3. TO oluştur: object_create path=.../Software/TechnologicalObjectGroup/TechnologicalObjects
    parameters={Name, OfSystemLibElement:"TO_PositioningAxis", OfSystemLibVersion:"V6.0"} (sürüm System.Version olmalı; araç çeviriyor).
 4. Sürücüye bağla: object_invoke path=.../TechnologicalObjects[<ad>]/service:AxisHardwareConnectionProvider/ActorInterface
@@ -21,7 +21,7 @@ Doğrulandı: 18.11.2026, TIA V18, test_MCP. S210 7 kW 6SL5310-1BE17-0xFx V6.1 (
 
 ## Varsayılanlar
 - DataAdaption=1: referans hız/tork sürücüden online okunur, offline değerler (3000/1500 rpm) yer tutucu.
-- Sonraki adımlar (henüz yapılmadı): mekanik (LeadScrew, dişli), yazılım limitleri, referanslama, kullanıcının mutlak konumlama FB'si ile MC_POWER/HOME/MOVEABSOLUTE.
+- Sonraki adımlar (henüz yapılmadı): mekanik (LeadScrew, dişli), yazılım limitleri, referanslama, Bilal'in S210_ABSOLUTE_KONTROL FB'si (manisa_V18) ile MC_POWER/HOME/MOVEABSOLUTE.
 
 ## Genel kontrol bloğu: S210_AbsCnt (18.11.2026, derleme 0 hata)
 - SCL FB; VAR_IN_OUT Axis : TO_PositioningAxis → her eksen kendi instance'ı ile (ör. S210_AbsCnt_Servo_1), Axis := "<TO DB>".

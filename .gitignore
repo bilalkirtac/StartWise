@@ -1,7 +1,16 @@
+# derleme çıktıları ve günlük
 bin/
-dist/
-work/
 *.log
-*.old.exe
-*.pem
-_lisans/
+# Siemens dosyaları depoya konmaz (lisans)
+Siemens.Engineering*.dll
+# Windows
+Thumbs.db
+desktop.ini
+# kapalı, müşteri bazlı içerik (S120, senkron, customer_lib ...) depoya ve pakete girmez
+knowledge/private/
+# paket çıktıları (sürümler GitHub Releases ile dağıtılır)
+dist/
+# geliştirme denemeleri
+work/
+# gerçek makineye ait elektrik projesi: Bilal onay verene kadar public değil
+examples/eplan-DENS_G140.pdf

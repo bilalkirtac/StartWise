@@ -4,7 +4,7 @@ Araç: `drive_prepare(plc, drive)` — tek çağrı, idempotent (tekrar çalış
 Doğrulandı 18.11.2026 (test_MCP, StartWise 0.24.1): Servo_1, Servo_2 (S210 105), Drive_1–6 (G120C / G120 CU240E-2 PN, telegram 20); derleme 0 hata.
 
 Kararlar (Bilal, 18.11.2026):
-- Önerilen yapı: servolar LAD FC "Servo Motors", asenkronlar LAD FC "Asenkron Motors", sürücü başına bir ağ; OB1 "Main" FC'leri çağırır.
+- Yapı manisa_V18 gibi: servolar LAD FC "Servo Motors", asenkronlar LAD FC "Asenkron Motors", sürücü başına bir ağ; OB1 "Main" FC'leri çağırır.
 - Arayüz = FB'nin KENDİ instance DB'si. Ayrı <sürücü>_IO DB / UDT YOK (gereksiz program yükü). Ağda FB pinleri boş bırakılır,
   senaryo kodu girişleri instance DB'ye yazar, çıkışları oradan okur. Bağlı pinler yalnız: servo `Axis` (TO), asenkron `HWIDSTW`/`HWIDZSW`.
 - Servo port topolojisi: hat (PLC son portu → mevcut servolar → yeni servo P1). Gerçek kablolama farklıysa mühendis düzeltir.

@@ -1,0 +1,8 @@
+Sıra;Ürün Grubu;Siemens MLFB Kodu;Teknik Açıklama;Adet;Birim
+1;PLC (CPU);6ES7511-1AK02-0AB0;SIMATIC S7-1500, CPU 1511-1 PN, 150 KB Program Hafızası;1;Adet
+2;Dijital Giriş (DI);6ES7521-1BH00-0AB0;SIMATIC S7-1500, DI 16x24VDC HF Modül;2;Adet
+3;Dijital Çıkış (DQ);6ES7522-1BH01-0AB0;SIMATIC S7-1500, DQ 16x24VDC/0.5A HF Modül;1;Adet
+4;Ön Konnektör;6ES7592-1AM00-0XB0;S7-1500 40-Pin Vidalı Ön Konnektör;3;Adet
+5;HMI Panel;6AV2123-2GB03-0AX0;SIMATIC HMI KTP700 Basic, 7" TFT Ekran, PROFINET;1;Adet
+6;Endüstriyel Switch;6GK5005-0BA00-1AB2;SCALANCE XB005 Yönetilemeyen IE Switch, 5x RJ45;1;Adet
+7;Frekans Konvertörü;6SL3210-1KE18-8UF1;SINAMICS G120C, 4.0 kW, 3AC 380-480V, Filtresiz, PROFINET;2;Adet
