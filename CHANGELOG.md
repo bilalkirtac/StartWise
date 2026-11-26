@@ -1,5 +1,8 @@
 # Değişiklik günlüğü — StartWise (eski adı TIA Assistant)
 
+## Unreleased
+- drive_prepare: in the LAD network every FB input and output is wired to its own instance DB member (e.g. EnableAxis <- "SINA_SPEED_Drive_6".EnableAxis, ActVelocity -> "SINA_SPEED_Drive_6".ActVelocity), so the values are visible on the call; scenario code still writes the instance DB. Exceptions: HWIDSTW/HWIDZSW (HW identifier constant), servo Axis (TO), SINA_SPEED ConfigAxis (left open, library default 16#003F). Networks with open pins are rewritten in place on the next call.
+
 ## 0.37.0 - 2026-11-26
 - One install step: the Claude plugin (`plugins/startwise`, `.claude-plugin/marketplace.json`) is removed. The desktop extension (.mcpb) is the whole product; its skills in `skills/` are served by the server (Skills over MCP `skill://` resources, and the `skill_list` / `skill_get` tools until Claude requests skills from local servers). The plugin's skill was a copy of `skills/startwise-tia` plus an "install the extension" note that is no longer needed, so no skill content is lost.
 - No exe anymore: build.cmd is removed. StartWise runs only from the .mcpb (start.ps1 compiles the sources in memory); development uses the extension option "Development source folder". docs/KURULUM.md rewritten for this.

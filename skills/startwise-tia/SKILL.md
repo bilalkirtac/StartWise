@@ -28,7 +28,7 @@ StartWise drives the TIA Portal V21 that is open on the user's computer through 
 |---|---|
 | Hardware | `catalog_find` → `device_add` → `module_plug`; addresses: `project_tree` io_addresses, `io_address_set` |
 | Network | `network_connect` (subnet, IO system, IP) |
-| SINAMICS drive ready for programming | `drive_prepare` (TO or telegram, control block, LAD network) - one call per drive |
+| SINAMICS drive ready for programming | `drive_prepare` (TO or telegram, control block, LAD network) - one call per drive; the instance DB is the interface, FB inputs and outputs are wired to their own instance members, SINA_SPEED ConfigAxis keeps the library default |
 | Valve / analog measurement | `equipment_types`, `equipment_prepare` (only on request) |
 | Tags, blocks | `tags_add`, `scl_import`, `block_import`/`block_export`, `block_source`, `lib_list`, `lib_copy_block` |
 | PLC alarms | `plc_alarm_texts` |

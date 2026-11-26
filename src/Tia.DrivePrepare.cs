@@ -140,9 +140,9 @@ namespace TiaAssistant
         }
 
         // Adds a LAD network to an existing LAD block (export -> insert -> import).
-        // Returns "exists" when 'marker' is already present, "replaced" when the network holding 'marker' also holds 'legacy'
-        // (old layout, rewritten in place), else "added".
-        static string AppendLadNetwork(PlcSoftware plc, PlcBlock block, string flgNet, string title, string marker, string legacy)
+        // Returns "exists" when 'marker' is already present, "replaced" when 'rewrite' says the network holding 'marker'
+        // is an old layout (rewritten in place), else "added".
+        static string AppendLadNetwork(PlcSoftware plc, PlcBlock block, string flgNet, string title, string marker, Func<string, bool> rewrite)
         {
             string xml;
             try { xml = ExportBlockXml(block); }
@@ -159,11 +159,11 @@ namespace TiaAssistant
             int id = Regex.Matches(xml, @"\bID=""([0-9A-F]+)""").Cast<Match>().Max(m => Convert.ToInt32(m.Groups[1].Value, 16)) + 1;
             if (xml.Contains(marker))
             {
-                if (legacy == null) return "exists";
+                if (rewrite == null) return "exists";
                 foreach (Match u in Regex.Matches(xml, @"<SW\.Blocks\.CompileUnit\b.*?</SW\.Blocks\.CompileUnit>", RegexOptions.Singleline))
                 {
                     if (!u.Value.Contains(marker)) continue;
-                    if (!u.Value.Contains(legacy)) return "exists";
+                    if (!rewrite(u.Value)) return "exists";
                     string unitNew = LadUnit(ref id, flgNet, title);
                     ImportBlockXml(plc, xml.Substring(0, u.Index) + unitNew + xml.Substring(u.Index + u.Length));
                     return "replaced";
@@ -279,7 +279,7 @@ namespace TiaAssistant
                 return U.Obj("drive", drive, "kind", kind, "steps", steps, "dry_run", true);
             }
 
-            string fcName, flg, title, marker, iface;
+            string fcName, flg, title, marker, iface, wired;
             if (kind == "servo")
             {
                 if (inByte < 0) throw new InvalidOperationException("Telegram addresses of '" + drive + "' not found; servo path needs a Startdrive drive.");
@@ -323,10 +323,10 @@ namespace TiaAssistant
                 string inst = "S210_AbsCnt_" + drive;
                 if (!BlockExists(plc, inst)) { SclImport(plcName, "DATA_BLOCK \"" + inst + "\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"S210_AbsCnt\"\nBEGIN\nEND_DATA_BLOCK\n", "StartWise_" + inst, false); step(inst, "created", null); }
 
-                List<Pin> pins = S210Pins.Select(p => new Pin { Name = p[0], Section = p[1], Type = p[2], Source = null }).ToList();
+                List<Pin> pins = S210Pins.Select(p => new Pin { Name = p[0], Section = p[1], Type = p[2], Source = inst + "." + p[0] }).ToList();
                 pins.Add(new Pin { Name = "Axis", Section = "InOut", Type = "TO_PositioningAxis", Source = drive });
                 fcName = ServoFc; flg = FbCallFlgNet("S210_AbsCnt", inst, pins);
-                title = drive + " - S210_AbsCnt (TO: " + drive + ", arayuz: " + inst + ")"; iface = inst; marker = "<Component Name=\"" + inst + "\" />";
+                title = drive + " - S210_AbsCnt (TO: " + drive + ", arayuz: " + inst + ")"; iface = inst; marker = "<Component Name=\"" + inst + "\" />"; wired = "<Component Name=\"ErrorID\" />";
             }
             else
             {
@@ -359,24 +359,26 @@ namespace TiaAssistant
                 string inst = "SINA_SPEED_" + drive;
                 if (!BlockExists(plc, inst)) { SclImport(plcName, "DATA_BLOCK \"" + inst + "\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\n\"SINA_SPEED\"\nBEGIN\nEND_DATA_BLOCK\n", "StartWise_" + inst, false); step(inst, "created", null); }
 
-                List<Pin> pins = SinaPins.Select(p => new Pin { Name = p[0], Section = p[1], Type = p[2], Source = null }).ToList();
+                // Pins show their own instance member; ConfigAxis stays open so the library default (16#003F) applies.
+                List<Pin> pins = SinaPins.Select(p => new Pin { Name = p[0], Section = p[1], Type = p[2], Source = p[0] != "ConfigAxis" ? inst + "." + p[0] : null }).ToList();
                 pins.Insert(5, new Pin { Name = "HWIDSTW", Section = "Input", Type = "HW_IO", Source = "const:" + hwid });
                 pins.Insert(6, new Pin { Name = "HWIDZSW", Section = "Input", Type = "HW_IO", Source = "const:" + hwid });
                 fcName = AsyncFc; flg = FbCallFlgNet("SINA_SPEED", inst, pins);
-                title = drive + " - SINA_SPEED (HW: " + hwid + ", arayuz: " + inst + ")"; iface = inst; marker = "<Component Name=\"" + inst + "\" />";
+                title = drive + " - SINA_SPEED (HW: " + hwid + ", arayuz: " + inst + ")"; iface = inst; marker = "<Component Name=\"" + inst + "\" />"; wired = "<Component Name=\"DiagId\" />";
             }
 
             // FC with one network per drive
             PlcBlock fcBlock = FindBlock(plc.BlockGroup.Blocks, plc.BlockGroup.Groups, fcName);
             if (fcBlock == null)
             {
-                ImportBlockXml(plc, NewLadFcXml(fcName, "StartWise: surucu basina bir ag. Komut/durum surucunun instance DB'sinde (girisler bos, senaryo kodu yazar).", flg, title));
+                ImportBlockXml(plc, NewLadFcXml(fcName, "StartWise: surucu basina bir ag. Komut/durum surucunun instance DB'sinde (pinler kendi instance uyelerine bagli, senaryo kodu instance DB'ye yazar/okur).", flg, title));
                 step("FC " + fcName, "created", "network for " + drive);
             }
             else
             {
-                string r = AppendLadNetwork(plc, fcBlock, flg, title, marker, "<Component Name=\"" + io + "\" />");
-                step("FC " + fcName, r == "added" ? "network added" : r == "replaced" ? "network rewritten (no " + io + " DB)" : "network exists", drive);
+                string legacyIo = "<Component Name=\"" + io + "\" />";
+                string r = AppendLadNetwork(plc, fcBlock, flg, title, marker, net => net.Contains(legacyIo) || !net.Contains(wired));
+                step("FC " + fcName, r == "added" ? "network added" : r == "replaced" ? "network rewritten (pins wired to " + iface + ")" : "network exists", drive);
                 if (r == "replaced" && BlockExists(plc, io))
                     step(io, "unused", "Not referenced by the network any more. Delete it after checking that no scenario code uses it (compile shows the users).");
             }
@@ -393,7 +395,7 @@ namespace TiaAssistant
             Dictionary<string, object> comp = (Dictionary<string, object>)Compile(plcName, "software");
             step("compile software", Convert.ToInt32(comp["errors"]) == 0 ? "ok" : "errors", "errors " + comp["errors"] + ", warnings " + comp["warnings"]);
             return U.Obj("drive", drive, "kind", kind, "interface_db", iface, "steps", steps, "compile", comp,
-                "note", "Scenario code writes the FB inputs and reads the outputs directly in \"" + iface + "\" (e.g. \"" + iface + "\"." + (kind == "servo" ? "Enable" : "EnableAxis") + "). The network leaves those pins open. Project not saved; call project_save.");
+                "note", "Scenario code writes the FB inputs and reads the outputs directly in \"" + iface + "\" (e.g. \"" + iface + "\"." + (kind == "servo" ? "Enable" : "EnableAxis") + "). The network wires each FB pin to its own instance member so the values are visible on the call" + (kind == "servo" ? "" : "; ConfigAxis stays open (library default 16#003F)") + ". Project not saved; call project_save.");
         }
     }
 }

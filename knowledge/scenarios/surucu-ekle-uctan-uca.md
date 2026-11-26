@@ -5,8 +5,13 @@ Doğrulandı 18.11.2026 (test_MCP, StartWise 0.24.1): Servo_1, Servo_2 (S210 105
 
 Kararlar (Bilal, 18.11.2026):
 - Yapı manisa_V18 gibi: servolar LAD FC "Servo Motors", asenkronlar LAD FC "Asenkron Motors", sürücü başına bir ağ; OB1 "Main" FC'leri çağırır.
-- Arayüz = FB'nin KENDİ instance DB'si. Ayrı <sürücü>_IO DB / UDT YOK (gereksiz program yükü). Ağda FB pinleri boş bırakılır,
-  senaryo kodu girişleri instance DB'ye yazar, çıkışları oradan okur. Bağlı pinler yalnız: servo `Axis` (TO), asenkron `HWIDSTW`/`HWIDZSW`.
+- Arayüz = FB'nin KENDİ instance DB'si. Ayrı <sürücü>_IO DB / UDT YOK (gereksiz program yükü). Senaryo kodu girişleri instance DB'ye yazar,
+  çıkışları oradan okur.
+- (26.11.2026) Ağda her FB girişi ve çıkışı kendi instance üyesine bağlanır (ör. EnableAxis ← "SINA_SPEED_Drive_6".EnableAxis,
+  ActVelocity → "SINA_SPEED_Drive_6".ActVelocity): değerler çağrıda görünür.
+  İstisnalar: servo `Axis` = TO, asenkron `HWIDSTW`/`HWIDZSW` = HW identifier sabiti, `ConfigAxis` boş kalır (kütüphane varsayılanı 16#003F).
+  Pinleri boş eski ağlar aynı çağrıda yerinde yeniden yazılır.
+  Doğrulandı 26.11.2026 (sync_test, V21, Drive_1 G120C telegram 20): eski ağ yeniden yazıldı, derleme 0 hata 0 uyarı; ikinci çağrı "network exists".
 - Servo port topolojisi: hat (PLC son portu → mevcut servolar → yeni servo P1). Gerçek kablolama farklıysa mühendis düzeltir.
 
 ## Akış (aracın yaptığı)
@@ -15,7 +20,7 @@ Kararlar (Bilal, 18.11.2026):
    FB S210_AbsCnt (knowledge/templates/S210_AbsCnt.scl, {MC_VERSION}=TO sürümü), instance "S210_AbsCnt_<sürücü>".
 3. Asenkron: SINA_SPEED yoksa açık DriveLib global kütüphanesinden kopyala; HW ID sabiti "<sürücü>~PROFINET_interface~Standard_telegram_20";
    instance "SINA_SPEED_<sürücü>".
-4. FC'ye ağ ekle (FC yoksa oluştur). Eski düzende (<sürücü>_IO'ya bağlı) ağ varsa yerinde yeniden yazar; artık kullanılmayan _IO DB'yi raporlar, silmez.
+4. FC'ye ağ ekle (FC yoksa oluştur). Eski düzende (pinleri boş ya da <sürücü>_IO'ya bağlı) ağ varsa yerinde yeniden yazar; artık kullanılmayan _IO DB'yi raporlar, silmez.
 5. OB1'de FC çağrısı yoksa ağ ekler. Yazılım derlemesi. Kaydetmez → project_save.
 
 ## Senaryo kodu nasıl sürer

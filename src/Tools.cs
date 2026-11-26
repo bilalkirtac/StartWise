@@ -531,8 +531,9 @@ namespace TiaAssistant
                 "(PLC last port -> ... -> drive port 1), FB S210_AbsCnt + instance S210_AbsCnt_<drive>, one network in LAD FC 'Servo Motors', OB1 'Main' calls the FC. " +
                 "Async (telegram 1/20/352): SINA_SPEED (from the opened DriveLib global library) + instance SINA_SPEED_<drive>, HW identifier constant, " +
                 "one network in LAD FC 'Asenkron Motors', OB1 call. Ends with a software compile; does NOT save. " +
-                "The instance DB is the drive's interface: the network leaves the FB pins open and scenario code writes inputs / reads outputs there " +
-                "(e.g. \"S210_AbsCnt_Servo_2\".Enable, \"SINA_SPEED_Drive_6\".ActVelocity). A network from the old layout (wired to a <drive>_IO DB) is rewritten in place. " +
+                "The instance DB is the drive's interface: scenario code writes inputs / reads outputs there; in the network each FB input and output is wired to its own instance member so the values are visible " +
+                "(SINA_SPEED ConfigAxis stays open = library default 16#003F; HWIDSTW/HWIDZSW = HW identifier constant; servo Axis = TO) " +
+                "(e.g. \"S210_AbsCnt_Servo_2\".Enable, \"SINA_SPEED_Drive_6\".ActVelocity). A network from an old layout (open pins or wired to a <drive>_IO DB) is rewritten in place. " +
                 "Run dry_run=true first to show the plan.",
                 Schema(new string[] { "plc", "drive" },
                     "plc", P("string", "PLC station name, e.g. PLC_1"),
