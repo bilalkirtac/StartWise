@@ -517,10 +517,11 @@ namespace TiaAssistant
                     "telegram", P("integer", "New main telegram number. Optional"),
                     "input_start_byte", P("integer", "Move the telegram's input (status) address range to this start byte. Optional"),
                     "output_start_byte", P("integer", "Move the telegram's output (control) address range to this start byte. Optional"),
+                    "drive", P("string", "Multi-axis drives (S120): drive object by name - axis rack or module name, e.g. 'Drive axis_2', 'Infeed_1'. Wins over drive_object. Optional"),
                     "drive_object", P("integer", "Index of the drive object for multi-axis devices (default 0)")),
                 delegate(Dictionary<string, object> a)
                 {
-                    return Tia.DriveTelegram(Station(a), U.Int(a, "telegram"), U.Int(a, "drive_object") ?? 0,
+                    return Tia.DriveTelegram(Station(a), U.Int(a, "telegram"), DriveObjectArg(a),
                         U.Int(a, "input_start_byte"), U.Int(a, "output_start_byte"));
                 });
 
@@ -591,13 +592,14 @@ namespace TiaAssistant
                                 "value", U.Obj("type", "number", "description", "New value in the parameter's unit")),
                             "required", new string[] { "parameter", "value" })),
                     "read", U.Obj("type", "array", "description", "Parameters to read, e.g. [\"p0304\", \"p0305\"]", "items", U.Obj("type", "string")),
+                    "drive", P("string", "Multi-axis drives (S120): drive object by name - axis rack or module name, e.g. 'Drive axis_2', 'Infeed_1'. Wins over drive_object. Optional"),
                     "drive_object", P("integer", "Index of the drive object for multi-axis devices (default 0)")),
                 delegate(Dictionary<string, object> a)
                 {
                     object rd; a.TryGetValue("read", out rd);
                     object st; a.TryGetValue("set", out st);
                     if (rd == null && st == null) throw new ArgumentException("Give 'read' and/or 'set'.");
-                    return Tia.DriveParameters(Station(a), rd, st, U.Int(a, "drive_object") ?? 0);
+                    return Tia.DriveParameters(Station(a), rd, st, DriveObjectArg(a));
                 });
 
             Add("drive_motor",
@@ -616,11 +618,12 @@ namespace TiaAssistant
                             "required", new string[] { "parameter", "value" })),
                     "motor_type", P("string", "Motor type, e.g. InductionMotor (default when writing) or SynchronousMotor"),
                     "drive_data_set", P("integer", "Drive/motor data set number (default 0)"),
+                    "drive", P("string", "Multi-axis drives (S120): drive object by name - axis rack or module name, e.g. 'Drive axis_2', 'Infeed_1'. Wins over drive_object. Optional"),
                     "drive_object", P("integer", "Index of the drive object for multi-axis devices (default 0)")),
                 delegate(Dictionary<string, object> a)
                 {
                     object d; a.TryGetValue("data", out d);
-                    return Tia.DriveMotor(Station(a), U.Str(a, "motor_type", false), d, U.Int(a, "drive_data_set") ?? 0, U.Int(a, "drive_object") ?? 0);
+                    return Tia.DriveMotor(Station(a), U.Str(a, "motor_type", false), d, U.Int(a, "drive_data_set") ?? 0, DriveObjectArg(a));
                 });
 
             Add("drive_parameter_list",
@@ -629,10 +632,11 @@ namespace TiaAssistant
                     "station", P("string", "Station name of the drive"),
                     "from", P("integer", "First parameter number"),
                     "to", P("integer", "Last parameter number"),
+                    "drive", P("string", "Multi-axis drives (S120): drive object by name - axis rack or module name, e.g. 'Drive axis_2', 'Infeed_1'. Wins over drive_object. Optional"),
                     "drive_object", P("integer", "Index of the drive object (default 0)")),
                 delegate(Dictionary<string, object> a)
                 {
-                    return Tia.DriveParameterList(Station(a), U.Int(a, "from") ?? 0, U.Int(a, "to") ?? 65535, U.Int(a, "drive_object") ?? 0);
+                    return Tia.DriveParameterList(Station(a), U.Int(a, "from") ?? 0, U.Int(a, "to") ?? 65535, DriveObjectArg(a));
                 });
 
             Add("plc_security",
@@ -733,6 +737,14 @@ namespace TiaAssistant
                     "station", P("string", "Station name or CPU name"),
                     "scope", U.Obj("type", "string", "enum", new string[] { "all", "hardware", "software" }, "description", "all (default), hardware or software")),
                 delegate(Dictionary<string, object> a) { return Tia.Compile(Station(a), U.Str(a, "scope", false) ?? "all"); });
+        }
+
+        // drive_object index, or the drive object chosen by its name ('drive', wins over the index).
+        static int DriveObjectArg(Dictionary<string, object> a)
+        {
+            string name = U.Str(a, "drive", false);
+            if (!string.IsNullOrEmpty(name)) return Tia.DriveObjectIndex(Station(a), name);
+            return U.Int(a, "drive_object") ?? 0;
         }
     }
 }

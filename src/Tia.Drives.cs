@@ -22,14 +22,90 @@ namespace TiaAssistant
     {
         // ---------------- drives (Startdrive) ----------------
 
-        static void CollectDriveObjects(DeviceItemComposition items, List<Siemens.Engineering.MC.Drives.DriveObject> list)
+        // One entry per drive object. A drive object can be reachable from several device items
+        // (S120: the axis rack "Drive axis_1" AND its Motor Module "DMM_18A"), so it is kept only once,
+        // under the first (outermost) item that offers it. 'Names' = that item plus its direct children,
+        // so an axis can be chosen by rack name ("Drive axis_2") or module name ("Motor Module_1").
+        class DriveObjectEntry
+        {
+            public Siemens.Engineering.MC.Drives.DriveObject Obj;
+            public int Number;
+            public string Item;
+            public List<string> Names = new List<string>();
+        }
+
+        static List<DriveObjectEntry> DriveObjectEntries(Device dev)
+        {
+            List<DriveObjectEntry> list = new List<DriveObjectEntry>();
+            CollectDriveObjects(dev.DeviceItems, list);
+            return list;
+        }
+
+        static void CollectDriveObjects(DeviceItemComposition items, List<DriveObjectEntry> list)
         {
             foreach (DeviceItem i in items)
             {
                 Siemens.Engineering.MC.Drives.DriveObjectContainer c = i.GetService<Siemens.Engineering.MC.Drives.DriveObjectContainer>();
-                if (c != null) foreach (Siemens.Engineering.MC.Drives.DriveObject o in c.DriveObjects) list.Add(o);
+                if (c != null)
+                    foreach (Siemens.Engineering.MC.Drives.DriveObject o in c.DriveObjects)
+                    {
+                        int number = -1;
+                        try { number = o.DriveObjectNumber; } catch { }
+                        bool seen = false;
+                        foreach (DriveObjectEntry e in list)
+                            if (Object.ReferenceEquals(e.Obj, o) || e.Obj.Equals(o) || (number > 0 && e.Number == number)) { seen = true; break; }
+                        if (seen) continue;
+                        DriveObjectEntry n = new DriveObjectEntry();
+                        n.Obj = o; n.Number = number; n.Item = i.Name;
+                        n.Names.Add(i.Name);
+                        foreach (DeviceItem ch in i.DeviceItems) n.Names.Add(ch.Name);
+                        list.Add(n);
+                    }
                 CollectDriveObjects(i.DeviceItems, list);
             }
+        }
+
+        static ArrayList DriveObjectSummary(List<DriveObjectEntry> list)
+        {
+            ArrayList r = new ArrayList();
+            for (int k = 0; k < list.Count; k++)
+            {
+                string main = null;
+                try
+                {
+                    foreach (Siemens.Engineering.MC.Drives.Telegram t in list[k].Obj.Telegrams)
+                        if (t.Type.ToString() == "MainTelegram") main = t.TelegramNumber.ToString();
+                }
+                catch { }
+                r.Add(U.Obj("index", k, "name", list[k].Item, "names", list[k].Names, "drive_object_number", list[k].Number, "main_telegram", main));
+            }
+            return r;
+        }
+
+        // Index by name (rack or module name, case-insensitive) when 'name' is given, else the given index.
+        static int ResolveDriveObject(Device dev, List<DriveObjectEntry> list, int index, string name)
+        {
+            if (list.Count == 0)
+                throw new InvalidOperationException("Station '" + dev.Name + "' exposes no Startdrive drive object. It is not a SINAMICS drive, or the drive is incomplete (e.g. power module missing).");
+            if (!string.IsNullOrEmpty(name))
+            {
+                for (int k = 0; k < list.Count; k++)
+                    foreach (string n in list[k].Names)
+                        if (string.Equals(n, name.Trim(), StringComparison.OrdinalIgnoreCase)) return k;
+                StringBuilder sb = new StringBuilder();
+                foreach (DriveObjectEntry e in list) { if (sb.Length > 0) sb.Append(", "); sb.Append("'" + e.Item + "'"); }
+                throw new InvalidOperationException("Station '" + dev.Name + "' has no drive object named '" + name + "'. Drive objects: " + sb + ".");
+            }
+            if (index < 0 || index >= list.Count)
+                throw new InvalidOperationException("Drive object index " + index + " does not exist; the station has " + list.Count + " (0.." + (list.Count - 1) + ").");
+            return index;
+        }
+
+        // Public for the tool layer: index of a drive object chosen by name.
+        public static int DriveObjectIndex(string stationName, string name)
+        {
+            Device dev = FindDevice(stationName);
+            return ResolveDriveObject(dev, DriveObjectEntries(dev), 0, name);
         }
 
         static ArrayList TelegramList(Siemens.Engineering.MC.Drives.DriveObject o)
@@ -129,14 +205,11 @@ namespace TiaAssistant
         public static object DriveTelegram(string stationName, int? telegram, int driveObjectIndex, int? inputStart, int? outputStart)
         {
             Device dev = FindDevice(stationName);
-            List<Siemens.Engineering.MC.Drives.DriveObject> objs = new List<Siemens.Engineering.MC.Drives.DriveObject>();
-            CollectDriveObjects(dev.DeviceItems, objs);
-            if (objs.Count == 0)
-                throw new InvalidOperationException("Station '" + dev.Name + "' exposes no Startdrive drive object. It is not a SINAMICS drive, or the drive is incomplete (e.g. power module missing).");
-            if (driveObjectIndex < 0 || driveObjectIndex >= objs.Count)
-                throw new InvalidOperationException("Drive object index " + driveObjectIndex + " does not exist; the station has " + objs.Count + ".");
-            Siemens.Engineering.MC.Drives.DriveObject o = objs[driveObjectIndex];
-            Dictionary<string, object> r = U.Obj("station", dev.Name, "drive_objects", objs.Count);
+            List<DriveObjectEntry> objs = DriveObjectEntries(dev);
+            int idx = ResolveDriveObject(dev, objs, driveObjectIndex, null);
+            Siemens.Engineering.MC.Drives.DriveObject o = objs[idx].Obj;
+            Dictionary<string, object> r = U.Obj("station", dev.Name, "drive_object", objs[idx].Item, "drive_object_index", idx);
+            if (objs.Count > 1) r["drive_objects"] = DriveObjectSummary(objs);
             if (telegram.HasValue)
             {
                 Siemens.Engineering.MC.Drives.Telegram main = null;
@@ -177,13 +250,8 @@ namespace TiaAssistant
         static Siemens.Engineering.MC.Drives.DriveObject DriveObjectOf(string stationName, int index, out Device dev)
         {
             dev = FindDevice(stationName);
-            List<Siemens.Engineering.MC.Drives.DriveObject> objs = new List<Siemens.Engineering.MC.Drives.DriveObject>();
-            CollectDriveObjects(dev.DeviceItems, objs);
-            if (objs.Count == 0)
-                throw new InvalidOperationException("Station '" + dev.Name + "' exposes no Startdrive drive object. It is not a SINAMICS drive, or the drive is incomplete (e.g. power module missing).");
-            if (index < 0 || index >= objs.Count)
-                throw new InvalidOperationException("Drive object index " + index + " does not exist; the station has " + objs.Count + ".");
-            return objs[index];
+            List<DriveObjectEntry> objs = DriveObjectEntries(dev);
+            return objs[ResolveDriveObject(dev, objs, index, null)].Obj;
         }
 
         // Accepts "p0304", "P304", "304", "p0304[0]", "r0021".

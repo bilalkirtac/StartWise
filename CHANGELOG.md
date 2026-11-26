@@ -1,5 +1,10 @@
 # Değişiklik günlüğü — StartWise (eski adı TIA Assistant)
 
+## Unreleased
+- Multi-axis drives (SINAMICS S120): drive objects were counted twice (once on the axis rack, once on its Motor Module), so S120 showed 7 indexes for 4 drive objects. Each drive object is now listed once.
+- drive_telegram, drive_parameters, drive_motor, drive_parameter_list: new optional `drive` argument - choose the drive object by name (rack or module name, e.g. "Drive axis_2", "Infeed_1", case-insensitive); wins over the `drive_object` index. Single-axis drives (G120, G120C, S210) are unchanged.
+- drive_telegram lists every drive object of a multi-axis device (index, name, drive object number, main telegram).
+
 ## 0.36.0 - 2026-11-26
 - Skills over MCP (io.modelcontextprotocol/skills, SEP-2640): the server declares the extension and the resources capability and serves `skills/list`, `skills/get`, `resources/list` and `resources/read` for `skill://` URIs. Skills live in `skills/<name>/SKILL.md` (packed into the .mcpb). First skill: startwise-tia, the same rules as the plugin skill.
 - Claude Desktop does not request skills from local servers yet (it connects with protocol 2025-11-25 and only the ui extension), so the same skills are also offered through the tools `skill_list` and `skill_get`; the server instructions tell Claude to read the matching skill first.
