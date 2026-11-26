@@ -75,3 +75,10 @@ Projenin yönünü belirleyen kararlar ve gerekçeleri. Yeni bir karar alındı�
 - Senkron hareket işleri (uçan testere, LCamHdl/LFFS sihirbazı) tehlikeli olduğu için açık kaynağa girmez; sadece müşteri bazlı, kapalı paket olarak.
 - customer_lib ve firma paketleri de kapalı. Yol haritası: Claude doc "StartWise Open Core Yol Haritası".
 - Deneme projesi: Documents\Automation\sync_test (CPU 1515T-2 PN FW V4.1, TO Master + Saw).
+
+
+## 26.11.2026 - Tek parça: uzantı + MCP üzerinden skill
+- Claude eklentisi (plugins/startwise, marketplace.json) kaldırıldı (0.37.0). Kurulum tek adım: .mcpb uzantısı.
+- Skill'ler repoda `skills/<ad>/SKILL.md`; .mcpb içine paketlenir ve sunucu sunar: Skills over MCP (`skills/list`, `skill://` resources) + istemci bunu henüz istemediği için `skill_list` / `skill_get` araçları. Claude Desktop local sunuculardan skill istemeye başlayınca ek iş gerekmez.
+- Neden: eklentinin skill'i `skills/startwise-tia` kopyasıydı (iki kopya senkron tutulmak zorundaydı); dizin başvurusu zaten geri çekildi (24.11). Bilal, bağlantılı masaüstü + proje düzeninde çalışmanın gözle görülür hızlı olduğunu gördü (26.11).
+- Exe üretilmez (26.11.2026): build.cmd kaldırıldı. Tek çalışma yolu .mcpb + start.ps1 (bellekte derleme, Microsoft imzalı powershell.exe). Geliştirme: uzantıda "Development source folder" = repo. Neden: imzasız exe'ler Norton/Symantec'e takılıyor; .mcpb yeterli.

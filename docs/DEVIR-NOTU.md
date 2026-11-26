@@ -4,7 +4,7 @@ Bu not, işi devralan (insan ya da model) için yazıldı. Önce bunu, sonra `DU
 
 ## Çalışma düzeni
 
-- Claude bu bilgisayarda komut çalıştıramaz; dosya okur/yazar. Derlemeyi Bilal `build.cmd` ile yapar, sonra Claude'u sistem tepsisinden Quit edip açar.
+- Claude bu bilgisayarda komut çalıştıramaz; dosya okur/yazar. Exe yok (0.37.0): uzantının "Development source folder" ayarı repoya bakar; kod değişince Bilal Claude'u sistem tepsisinden Quit edip açar, start.ps1 src\'yi bellekte derler. Paket: pack.cmd. `bin\` eski exe kalıntılarıdır; antivirüsü tetiklememek için taranmaz/okunmaz.
 - Kod C# 5 sözdizimiyle yazılır (Windows'un kendi derleyicisi). Göndermeden önce V18 `Siemens.Engineering.dll` dosyasına karşı derlenerek doğrulanır.
 - Bir API çağrısı tahmin edilmez: imzası `PublicAPI\V18\Siemens.Engineering.xml` içinden okunur, sonra gerçek TIA'da denenir.
 - Araç parametresi `station` kullanılır; köprü `device` adını yutuyor (çağrılarda ikisini birden vermek zararsız).

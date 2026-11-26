@@ -1,6 +1,9 @@
 # Değişiklik günlüğü — StartWise (eski adı TIA Assistant)
 
-## Unreleased
+## 0.37.0 - 2026-11-26
+- One install step: the Claude plugin (`plugins/startwise`, `.claude-plugin/marketplace.json`) is removed. The desktop extension (.mcpb) is the whole product; its skills in `skills/` are served by the server (Skills over MCP `skill://` resources, and the `skill_list` / `skill_get` tools until Claude requests skills from local servers). The plugin's skill was a copy of `skills/startwise-tia` plus an "install the extension" note that is no longer needed, so no skill content is lost.
+- No exe anymore: build.cmd is removed. StartWise runs only from the .mcpb (start.ps1 compiles the sources in memory); development uses the extension option "Development source folder". docs/KURULUM.md rewritten for this.
+- pack.ps1 no longer updates a plugin manifest. README and installation guide (docs/KURULUM-KULLANICI.md, StartWise-Kurulum.pdf) describe the single extension install.
 - Multi-axis drives (SINAMICS S120): drive objects were counted twice (once on the axis rack, once on its Motor Module), so S120 showed 7 indexes for 4 drive objects. Each drive object is now listed once.
 - drive_telegram, drive_parameters, drive_motor, drive_parameter_list: new optional `drive` argument - choose the drive object by name (rack or module name, e.g. "Drive axis_2", "Infeed_1", case-insensitive); wins over the `drive_object` index. Single-axis drives (G120, G120C, S210) are unchanged.
 - drive_telegram lists every drive object of a multi-axis device (index, name, drive object number, main telegram).

@@ -22,29 +22,31 @@ The engineer stays in control: every change is visible in TIA Portal, destructiv
 
 ## Install
 
-StartWise has two parts. Install both:
+StartWise is one Claude Desktop extension: the local server that talks to TIA Portal, together with its skills.
 
-1. **The tools (Claude Desktop extension).** Download `StartWise-<version>.mcpb` from the [Releases](https://github.com/bilalkirtac/startwise/releases) page, then Claude Desktop → Settings → Extensions → Advanced settings → **Install Extension…**. This is the local server that talks to TIA Portal.
-2. **The skill (Claude plugin).** Settings → Plugins → Add → marketplace `bilalkirtac/StartWise`, then install **startwise**. It teaches Claude the rules and workflows for TIA Portal (defaults, confirmations, which tool for which job).
+1. Download `StartWise-<version>.mcpb` from the [Releases](https://github.com/bilalkirtac/startwise/releases) page.
+2. Claude Desktop → Settings → Extensions → Advanced settings → **Install Extension…** → choose the file → Install, then restart Claude.
+
+No separate plugin is needed. The skills (rules and workflows for TIA Portal: defaults, confirmations, which tool for which job) live in `skills/` and are served by the StartWise server itself: over MCP as `skill://` resources (Skills over MCP) for clients that support it, and through the tools `skill_list` / `skill_get` for clients that do not yet.
 
 **Check the download (optional).** Each release lists the SHA-256 checksum of the `.mcpb` (also in `StartWise-<version>.sha256`). In PowerShell: `Get-FileHash .\StartWise-<version>.mcpb` and compare. The package contains no exe: Claude starts Windows PowerShell, which compiles the C# sources from the package in memory and runs the server.
 
-Then open TIA Portal V21 and tell Claude *"connect to TIA"*. On the first connection TIA Portal asks to allow Openness access: choose **Yes to all**. A Turkish installation guide is in [docs/KURULUM.md](docs/KURULUM.md).
+Then open TIA Portal V21 and tell Claude *"connect to TIA"*. On the first connection TIA Portal asks to allow Openness access: choose **Yes to all**. A Turkish installation guide is in [docs/KURULUM-KULLANICI.md](docs/KURULUM-KULLANICI.md).
 
 ## Build from source
 
-`pack.cmd` creates the `.mcpb` package in `dist\`: it compiles `src\*.cs` in memory with the C# compiler that ships with Windows (.NET Framework 4.8), against the Openness assemblies of your TIA installation, runs a self test and packs the sources with `start.ps1`. No SDK or NuGet packages are needed. `build.cmd` (optional) builds a standalone `bin\V21\TiaAssistant.exe` for development; an unsigned exe may be removed by antivirus software.
+`pack.cmd` creates the `.mcpb` package in `dist\`: it compiles `src\*.cs` in memory with the C# compiler that ships with Windows (.NET Framework 4.8), against the Openness assemblies of your TIA installation, runs a self test and packs the sources with `start.ps1`. No SDK or NuGet packages are needed. No exe is built. For development, set the extension option **Development source folder** to your clone: StartWise is then compiled from that `src\` at every Claude start.
 
 - `src/` – the MCP server (C#)
 - `knowledge/` – defaults, scenarios, equipment blocks (SCL) and the hardware-attribute index Claude reads while working; editable without rebuilding
-- `plugins/startwise/` – the Claude plugin (skill, manifest, icon); this folder is what the plugin directory reviews
+- `skills/` – the skills (`<name>/SKILL.md` plus supporting files), packed into the extension and served by the server
 - `packaging/` – extension manifest, icon, installation guide (PDF)
 
 Siemens Openness assemblies are **not** part of this repository; they are loaded from your own TIA Portal installation.
 
 ## Türkçe
 
-StartWise, Claude'un TIA Portal V21'i kendi bilgisayarınızda, çevrimdışı olarak kullanmasını sağlar: donanım, ağ, sürücüler, saha ekipmanı, tag'ler, bloklar, alarmlar ve HMI ekranları düz cümlelerle kurulur. Kurulum rehberi: [docs/KURULUM.md](docs/KURULUM.md). İletişim ve destek: bilal.kirtac@gmail.com
+StartWise, Claude'un TIA Portal V21'i kendi bilgisayarınızda, çevrimdışı olarak kullanmasını sağlar: donanım, ağ, sürücüler, saha ekipmanı, tag'ler, bloklar, alarmlar ve HMI ekranları düz cümlelerle kurulur. Kurulum rehberi: [docs/KURULUM-KULLANICI.md](docs/KURULUM-KULLANICI.md). İletişim ve destek: bilal.kirtac@gmail.com
 
 ## For companies
 

@@ -13,7 +13,7 @@ namespace TiaAssistant
 {
     public static class Program
     {
-        public const string ServerVersion = "0.36.0";
+        public const string ServerVersion = "0.37.0";
 #if TIA_V18
         public const string TiaMajor = "18";
 #else
@@ -295,7 +295,7 @@ namespace TiaAssistant
         }
 
         // knowledge\ folder next to bin\ : plain Markdown the engineer can edit without rebuilding.
-        // Searched upwards, so bin\TiaAssistant.exe (V18) and bin\V21\TiaAssistant.exe share one knowledge folder.
+        // Searched upwards from STARTWISE_HOME (set by start.ps1).
         public static string KnowledgeDir()
         {
             string dir = Program.HomeDir();

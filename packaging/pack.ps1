@@ -1,12 +1,12 @@
 # Packs StartWise as a Claude Desktop extension (.mcpb = zip with manifest.json at the root).
-# Run after build.cmd (V21):   powershell -ExecutionPolicy Bypass -File packaging\pack.ps1
+# Run:   pack.cmd   (or: powershell -ExecutionPolicy Bypass -File packaging\pack.ps1)
 # Output: dist\StartWise-<version>.mcpb  -> double-click it (or drag it into Claude Desktop) to install.
 # The package carries the C# sources and start.ps1: Windows PowerShell compiles them in memory at start-up,
 # so no unsigned StartWise exe is written to the user's disk. Plus manifest, icon and knowledge\ (without generators).
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 # Check exactly what ships: start.ps1 compiles src\*.cs in memory and runs the self test.
-# No exe is needed (antivirus may remove an unsigned bin\V21\TiaAssistant.exe).
+# No exe is built anywhere (antivirus flags unsigned exes).
 $check = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'start.ps1') --selftest 2>&1 | Out-String
 if ($LASTEXITCODE -ne 0) { throw "In-memory build / self test failed:`n$check" }
 Write-Host ('Self test (in-memory build): ' + $check.Trim())
@@ -19,15 +19,6 @@ if (-not $ver) { throw 'ServerVersion not found in src\Program.cs' }
 # Plain text replace (no JSON round trip: Windows PowerShell's ConvertTo-Json rewrites arrays and escapes).
 $manifest = Get-Content (Join-Path $PSScriptRoot 'mcpb\manifest.json') -Raw -Encoding UTF8
 $manifest = [regex]::Replace($manifest, '"version"\s*:\s*"[^"]*"', ('"version": "' + $ver + '"'), 1)
-
-# Claude plugin: version and release URL of the bundled MCP server follow ServerVersion.
-$pj = Join-Path $root 'plugins\startwise\.claude-plugin\plugin.json'
-if (Test-Path $pj) {
-    $p = Get-Content $pj -Raw -Encoding UTF8
-    $p = [regex]::Replace($p, '"version"\s*:\s*"[^"]*"', ('"version": "' + $ver + '"'), 1)
-    $p = [regex]::Replace($p, 'releases/download/v[^/]+/StartWise-[^"]+\.mcpb', ('releases/download/v' + $ver + '/StartWise-' + $ver + '.mcpb'))
-    [System.IO.File]::WriteAllText($pj, $p, (New-Object System.Text.UTF8Encoding($false)))
-}
 
 $dist = Join-Path $root 'dist'
 New-Item -ItemType Directory -Force -Path $dist | Out-Null
