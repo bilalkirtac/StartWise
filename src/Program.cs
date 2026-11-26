@@ -83,6 +83,7 @@ namespace TiaAssistant
             if (method == "initialize")
             {
                 object pv; prm.TryGetValue("protocolVersion", out pv);
+                Log("initialize " + _json.Serialize(prm));
                 SendResult(id, U.Obj(
                     "protocolVersion", (pv as string) ?? "2024-11-05",
                     "capabilities", U.Obj("tools", U.Obj(), "resources", U.Obj(),
