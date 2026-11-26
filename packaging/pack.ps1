@@ -55,6 +55,14 @@ try {
     Get-ChildItem $k -Recurse -File | Where-Object { $_.FullName -notmatch '\\generators\\' } | ForEach-Object {
         Add-Entry $_.FullName ('knowledge/' + $_.FullName.Substring($k.Length + 1))
     }
+
+    # Skills served over MCP (io.modelcontextprotocol/skills): skills\<name>\SKILL.md + supporting files
+    $sk = Join-Path $root 'skills'
+    if (Test-Path $sk) {
+        Get-ChildItem $sk -Recurse -File | ForEach-Object {
+            Add-Entry $_.FullName ('skills/' + $_.FullName.Substring($sk.Length + 1).Replace('\', '/'))
+        }
+    }
 }
 finally { $zip.Dispose() }
 

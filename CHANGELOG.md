@@ -1,6 +1,7 @@
 # Değişiklik günlüğü — StartWise (eski adı TIA Assistant)
 
-## 0.36.0 - 2026-11-25
+## 0.36.0 - 2026-11-26
+- Skills over MCP (io.modelcontextprotocol/skills, SEP-2640): the server declares the extension and the resources capability and serves `skills/list`, `skills/get`, `resources/list` and `resources/read` for `skill://` URIs. Skills live in `skills/<name>/SKILL.md` (packed into the .mcpb). First skill: startwise-tia, the same rules as the plugin skill.
 - New tool `lib_open`: opens a global library from its .al21 file or folder (read-only), e.g. Siemens DriveLib or a company library; then `lib_list`, `lib_copy_block` and `drive_prepare` can use it.
 - lib_open without a path searches Documents\Automation (TIA's default folder, also when Documents is redirected, e.g. to OneDrive) for *.al21, filtered by name.
 - Extension setting "Development source folder" (STARTWISE_SRC): start.ps1 compiles that repository's src\ and uses its knowledge\, so a Claude restart picks up changes without a new package.

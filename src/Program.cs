@@ -85,12 +85,28 @@ namespace TiaAssistant
                 object pv; prm.TryGetValue("protocolVersion", out pv);
                 SendResult(id, U.Obj(
                     "protocolVersion", (pv as string) ?? "2024-11-05",
-                    "capabilities", U.Obj("tools", U.Obj()),
+                    "capabilities", U.Obj("tools", U.Obj(), "resources", U.Obj(),
+                        "extensions", U.Obj(Skills.ExtensionId, U.Obj())),
                     "serverInfo", U.Obj("name", "startwise", "version", ServerVersion),
                     "instructions", Tools.Instructions));
             }
             else if (method == "ping") { SendResult(id, U.Obj()); }
             else if (method == "tools/list") { SendResult(id, U.Obj("tools", Tools.List())); }
+            else if (method == "skills/list" || method == "skills/get" || method == "resources/list" || method == "resources/read")
+            {
+                object u; prm.TryGetValue("uri", out u);
+                Log(method + (u != null ? " " + u : ""));
+                try
+                {
+                    object r = method == "skills/list" ? Skills.List()
+                             : method == "skills/get" ? Skills.Get(u as string)
+                             : method == "resources/list" ? Skills.ResourceList()
+                             : Skills.Read(u as string);
+                    if (r == null) SendError(id, -32602, "Unknown skill or resource: " + u);
+                    else SendResult(id, r);
+                }
+                catch (Exception ex) { SendError(id, -32603, U.Describe(ex)); }
+            }
             else if (method == "tools/call")
             {
                 object n; prm.TryGetValue("name", out n);
