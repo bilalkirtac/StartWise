@@ -46,6 +46,14 @@ Mühendis bir elektrik projesi (Eplan P8 veya AutoCAD Electrical'dan alınmış 
 - Kompakt CPU'larda `io_addresses` listesinde hızlı sayıcı (`HSC_n`, %I1000 ve sonrası) ve darbe çıkışı (`Pulse_n`, %Q1000 ve sonrası) aralıkları da görünür; bunlar şemadaki kanallar değildir, atlanır. Dahili kanallar `DI 14/DQ 10_1` ve `AI 2_1` öğelerindedir.
 - Şemadaki sayfa numarası olarak çizimin kendi numarası kullanılır (antetteki `4/7`), PDF sayfa sırası değil; çapraz referanslar (`/7.1`) bu numarayı kullanır.
 
+- (27.11.2026, `eplan_skillTest`, DALSAN 26000_PLC + 26000_MCC, 132 sayfa) Uzak IO panosu (ET200M IM153-2 + 7 DI32 + 2 DQ32) ve MCC'deki 21 G120 CU240E-2 DP + 1 S120 CU320-2 DP PROFIBUS'a bağlandı; 288 tag, derleme 0 hata.
+  - Çizimde DP master CPU olmayabilir (DP hattı başka panoya gider): CPU mühendise sorulur.
+  - Tag metni koordinatla eşlenir: `pdftotext -bbox`, kanal etiketlerinin (`I0.0`) x merkezine en yakın, kart kutusunun altındaki ve antetin üstündeki kelimeler. Antet/başlık bloğu metinleri dışarıda bırakılır.
+  - Çizimdeki kanal adresleri yanlış olabilir (ör. DI7 sayfalarında I20.0, DQ2 sayfalarında Q0.0 tekrar). Kart sırası (sayfa başlığı "Module 7", kart adı) esastır; TIA'daki gerçek adres kullanılır ve fark raporlanır.
+  - Kod + işlev çok satırlıysa ad = son satır + ekipman kodu (`MOTOR_KORUMA_26_110_10`); açıklama yoruma.
+  - PROFIBUS: G120 DP varsayılan adresi 126 gelir (veri alışverişinde kullanılamaz) → `network_connect ip=<adres>` ile sıralı adres (master 2, slave'ler 3..). Master adresi de aynı araçla değiştirilir.
+  - S120 CU320-2 DP + CUA31 + PM240-2: istasyonda `PlugNew OrderNumber:6SL3210-...` (CUA'yı Startdrive kendisi ekler). Eksende telegram 20 yok → 1.
+
 ## Kapsam dışı
 
 Güç devresi, klemens planı ve kablo listesi üretimi; Eplan'ın kendi dışa aktarım dosyalarının (AML, EDZ) okunması; safety kanalları.
